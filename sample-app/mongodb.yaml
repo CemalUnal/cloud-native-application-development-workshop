@@ -1,0 +1,73 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: mongo-deployment-pv
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 200Mi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/data/mongo"
+
+---
+
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: mongo-deployment-pvc
+  namespace: k8s-demo
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Mi
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: mongo-deployment
+  namespace: k8s-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo-deployment
+  template:
+    metadata:
+      labels:
+        app: mongo-deployment
+    spec:
+      containers:
+      - image: mongo:4.0.2
+        name: mongo-deployment
+        ports:
+          - containerPort: 27017
+        volumeMounts:
+          - name: mongo-deployment-pv
+            mountPath: /data/db
+        imagePullPolicy: IfNotPresent
+      volumes:
+        - name: mongo-deployment-pv
+          persistentVolumeClaim:
+            claimName: mongo-deployment-pvc
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-deployment
+  namespace: k8s-demo
+  labels:
+    app: mongo-deployment
+spec:
+  ports:
+  - port: 27017
+  selector:
+    app: mongo-deployment

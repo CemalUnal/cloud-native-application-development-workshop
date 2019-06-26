@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gateway-deployment
+  namespace: k8s-demo
+data:
+  simple-backend-service: "http://simple-backend-deployment-service:8090"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-deployment-service
+  namespace: k8s-demo
+  labels:
+    app: gateway-deployment
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9090
+  selector:
+    app: gateway-deployment
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: gateway-deployment
+  labels:        
+    app: gateway-deployment
+  namespace: k8s-demo
+spec: 
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: gateway-deployment
+  template: 
+    metadata:
+      labels:        
+        app: gateway-deployment
+    spec:
+      containers:
+        - image: cunal/k8s-demo-gateway:v0.0.1
+          imagePullPolicy: Always
+          # resources:
+          #   requests:
+          #     memory: "400Mi"
+          #     cpu: "500m"
+          #   limits:
+          #     memory: "800Mi"
+          #     cpu: "700m"
+          name: gateway-deployment
+          ports: 
+            - containerPort: 9090
+          env:
+            - name: SIMPLE_BACKEND_SERVICE
+              valueFrom:
+                configMapKeyRef:
+                  name: gateway-deployment
+                  key: simple-backend-service
