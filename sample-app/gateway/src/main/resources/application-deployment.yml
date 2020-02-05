@@ -1,0 +1,20 @@
+server:
+  port: 80
+  servlet:
+    context-path: /api
+
+zuul:
+  routes:
+    backend:
+      path: /simple-backend/**
+      url: ${SIMPLE_BACKEND_SERVICE}
+
+logging:
+  level:
+    org:
+      springframework:
+        cloud:
+          netflix: info
+    io:
+      github:
+        cemalunal: info

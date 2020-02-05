@@ -1,0 +1,20 @@
+server:
+  port: 9090
+  servlet:
+    context-path: /api
+
+zuul:
+  routes:
+    backend:
+      path: /simple-backend/**
+      url: http://localhost:8090/
+
+logging:
+  level:
+    org:
+      springframework:
+        cloud:
+          netflix: info
+    io:
+      github:
+        cemalunal: info
