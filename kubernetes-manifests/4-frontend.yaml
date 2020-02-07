@@ -4,7 +4,7 @@ metadata:
   name: simple-frontend-cm
   namespace: k8s-demo
 data:
-  REACT_APP_BACKEND_URI: "http://localhost:9090/api/simple-backend"
+  REACT_APP_BACKEND_URI: "http://localhost:9091/api/simple-backend"
 
 ---
 

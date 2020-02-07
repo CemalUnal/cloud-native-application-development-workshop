@@ -20,5 +20,7 @@ VOLUME /tmp
 COPY --from=maven /app/target/*.jar /app/target/
 COPY --from=maven /app/target/classes/*.yml /app/target/classes/
 
+#USER gateway
+
 # set the startup command to run binary
 CMD java ${JAVA_OPTS} -jar  /app/target/*.jar

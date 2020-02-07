@@ -1,0 +1,102 @@
+version: "3"
+
+services:
+
+  frontend:
+    image: cunal/demo-frontend:v0.0.1
+    container_name: frontend
+    restart: on-failure
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+    networks:
+      - demo-network
+    environment:
+      - REACT_APP_BACKEND_URI=http://localhost:9091/api/simple-backend
+    ports:
+      - "5000:5000"
+
+  backend:
+    image: cunal/demo-backend:v0.0.1
+    container_name: backend
+    restart: on-failure
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+    networks:
+      - demo-network
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/sample-app
+      - JAVA_OPTS=-Dspring.profiles.active=deployment -Dserver.port=80 -Xms125m -Xmx250m
+    ports:
+      - "80"
+  
+  gateway:
+    image: cunal/demo-gateway:v0.0.2
+    container_name: gateway
+    restart: on-failure
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+    networks:
+      - demo-network
+    environment:
+      - SIMPLE_BACKEND_SERVICE=http://backend
+      - JAVA_OPTS=-Dspring.profiles.active=deployment -Dserver.port=80 -Xms125m -Xmx250m
+      - ZIPKIN_BASE_URL=http://jaeger:9411
+    ports:
+      - "9091:80"
+
+  mongodb:
+    image: mongo:4.0.2
+    container_name: mongodb
+    restart: on-failure
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+    networks:
+      - demo-network
+    volumes:
+      - mongodb_data:/data/db
+    ports:
+      - "27017"
+  
+  jaeger:
+    image: jaegertracing/all-in-one:1.14
+    container_name: jaeger
+    restart: on-failure
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+    networks:
+      - demo-network
+    environment:
+      - COLLECTOR_ZIPKIN_HTTP_PORT=9411
+      - SPAN_STORAGE_TYPE=badger
+      - BADGER_EPHEMERAL=false
+      - BADGER_DIRECTORY_VALUE=/badger/data
+      - BADGER_DIRECTORY_KEY=/badger/key
+    volumes:
+      - jaeger_badger_data:/badger
+    ports:
+      - "5775:5775"
+      - "6831:6831"
+      - "6832:6832"
+      - "5778:5778"
+      - "16686:16686"
+      - "14268:14268"
+      - "9411:9411"
+
+networks:
+  demo-network:
+    external:
+      name: demo-network
+
+volumes:
+  mongodb_data: {}
+  jaeger_badger_data: {}

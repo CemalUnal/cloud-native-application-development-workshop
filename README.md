@@ -1,12 +1,21 @@
-# intro-to-k8s-bvayo-2019
-This repository contains the materials for Introduction to Kubernetes for BVAYO 2019. It contains example Kubernetes manifests for common Kubernetes resources.
+# Intro to Docker and Kubernetes
 
 ## Repository Structure
-- [kubernetes-resources](./kubernetes-resources) contains the manifests for basic Kubernetes resources.
-
+- [docker-compose-manifests](./kubernetes-resources) contains the manifests for basic Kubernetes resources.
+- [kubernetes-manifests](./kubernetes-resources) contains the manifests for basic Kubernetes resources.
 - [sample-app](./sample-app) contains the Kubernetes manifests for a simple frontend and a backend.
 
 ## Setting the Environment
+
+### Installing Docker
+
+TODO
+
+### Installing Docker Compose
+
+TODO
+
+### Installing Kubernetes Locally
 We can spin up a Kubernetes for demo purposes. There are two good options:
 
 - [Kubernetes in Docker](https://kind.sigs.k8s.io/)
@@ -81,7 +90,15 @@ $ kubectl cluster-info
 $ kubectl get nodes -owide
 ```
 
-### Deploying Sample application to the Kubernetes
+## Running the Sample Application
+
+### Docker Compose Way
+
+```bash
+bash start.sh
+```
+
+### Kubernetes Way
 Change your directory to the `sample-app` folder. Apply the Kubernetes manifests:
 
 ```bash
