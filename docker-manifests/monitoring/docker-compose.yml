@@ -10,7 +10,7 @@ services:
       options:
         fluentd-address: localhost:24224
     networks:
-      - demo-network
+      - demo-compose-network
     ports:
       - "9090:9090"
     volumes:
@@ -23,6 +23,7 @@ services:
       - '--web.console.templates=/etc/prometheus/consoles'
       - '--storage.tsdb.retention.time=200h'
       - '--web.enable-lifecycle'
+
   nodeexporter:
     image: prom/node-exporter:v0.18.1
     container_name: nodeexporter
@@ -32,7 +33,7 @@ services:
       options:
         fluentd-address: localhost:24224
     networks:
-      - demo-network
+      - demo-compose-network
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
@@ -54,7 +55,7 @@ services:
       options:
         fluentd-address: localhost:24224
     networks:
-      - demo-network
+      - demo-compose-network
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:rw
@@ -75,7 +76,7 @@ services:
       options:
         fluentd-address: localhost:24224
     networks:
-      - demo-network
+      - demo-compose-network
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
@@ -90,9 +91,9 @@ services:
       - "4000:3000"
 
 networks:
-  demo-network:
+  demo-compose-network:
     external:
-      name: demo-network
+      name: demo-compose-network
 
 volumes:
   prometheus_data: {}

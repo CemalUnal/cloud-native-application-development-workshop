@@ -48,7 +48,7 @@ spec:
         app: gateway-deployment
     spec:
       containers:
-        - image: cunal/k8s-demo-gateway:v0.0.2
+        - image: cunal/demo-gateway:v0.0.2
           imagePullPolicy: IfNotPresent
           resources:
             requests:
@@ -63,3 +63,23 @@ spec:
           envFrom:
           - configMapRef:
               name: gateway-cm
+
+---
+
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: gateway-hpa
+  namespace: k8s-demo
+spec:
+  scaleTargetRef:
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    name: gateway-deployment
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      targetAverageUtilization: 70

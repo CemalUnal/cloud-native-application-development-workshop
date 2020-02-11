@@ -11,7 +11,7 @@ services:
       options:
         fluentd-address: localhost:24224
     networks:
-      - demo-network
+      - demo-compose-network
     environment:
       - REACT_APP_BACKEND_URI=http://localhost:9091/api/simple-backend
     ports:
@@ -26,7 +26,7 @@ services:
       options:
         fluentd-address: localhost:24224
     networks:
-      - demo-network
+      - demo-compose-network
     environment:
       - MONGODB_URI=mongodb://mongodb:27017/sample-app
       - JAVA_OPTS=-Dspring.profiles.active=deployment -Dserver.port=80 -Xms125m -Xmx250m
@@ -42,7 +42,7 @@ services:
       options:
         fluentd-address: localhost:24224
     networks:
-      - demo-network
+      - demo-compose-network
     environment:
       - SIMPLE_BACKEND_SERVICE=http://backend
       - JAVA_OPTS=-Dspring.profiles.active=deployment -Dserver.port=80 -Xms125m -Xmx250m
@@ -59,7 +59,7 @@ services:
       options:
         fluentd-address: localhost:24224
     networks:
-      - demo-network
+      - demo-compose-network
     volumes:
       - mongodb_data:/data/db
     ports:
@@ -74,7 +74,7 @@ services:
       options:
         fluentd-address: localhost:24224
     networks:
-      - demo-network
+      - demo-compose-network
     environment:
       - COLLECTOR_ZIPKIN_HTTP_PORT=9411
       - SPAN_STORAGE_TYPE=badger
@@ -91,11 +91,28 @@ services:
       - "16686:16686"
       - "14268:14268"
       - "9411:9411"
+  
+  mongodb-exporter:
+    image: cunal/mongodb-exporter:latest
+    container_name: mongodb-exporter
+    restart: on-failure
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+    networks:
+      - demo-compose-network
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017
+    depends_on:
+      - mongodb
+    ports:
+      - "9216"
 
 networks:
-  demo-network:
+  demo-compose-network:
     external:
-      name: demo-network
+      name: demo-compose-network
 
 volumes:
   mongodb_data: {}

@@ -7,7 +7,7 @@ services:
       - ./fluentd/conf:/fluentd/etc
     container_name: fluentd
     networks:
-      - demo-network
+      - demo-compose-network
     restart: on-failure
     ports:
       - "24224:24224"
@@ -16,11 +16,11 @@ services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.2.0
     environment:
-      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - "discovery.type=single-node"
     container_name: elasticsearch
     networks:
-      - demo-network
+      - demo-compose-network
     restart: on-failure
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
@@ -31,7 +31,7 @@ services:
     image: kibana:7.2.0
     container_name: kibana
     networks:
-      - demo-network
+      - demo-compose-network
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
     restart: on-failure
@@ -39,9 +39,9 @@ services:
       - "5601:5601"
 
 networks:
-  demo-network:
+  demo-compose-network:
     external:
-      name: demo-network
+      name: demo-compose-network
 
 volumes:
   elasticsearch_data: {}

@@ -47,7 +47,7 @@ spec:
         app: simple-frontend-deployment
     spec:
       containers:
-        - image: cunal/k8s-demo-simple-frontend:v0.0.8
+        - image: cunal/demo-frontend:v0.0.1
           imagePullPolicy: IfNotPresent
           resources:
             requests:
@@ -62,3 +62,23 @@ spec:
           envFrom:
           - configMapRef:
               name: simple-frontend-cm
+
+---
+
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: simple-frontend-hpa
+  namespace: k8s-demo
+spec:
+  scaleTargetRef:
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    name: simple-frontend-deployment
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      targetAverageUtilization: 70
