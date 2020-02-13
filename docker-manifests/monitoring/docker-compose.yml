@@ -64,8 +64,6 @@ services:
       - /cgroup:/cgroup:ro # only for Linux
     ports:
       - "8070:8080"
-    labels:
-      org.label-schema.group: "monitoring"
 
   grafana:
     image: grafana/grafana:6.3.6
@@ -79,14 +77,11 @@ services:
       - demo-compose-network
     environment:
       - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_USERS_ALLOW_SIGN_UP=false
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./grafana/datasources:/etc/grafana/datasources
-      - ./grafana/dashboards:/etc/grafana/dashboards
-      - ./grafana/setup.sh:/setup.sh
-    entrypoint: /setup.sh
+      - ./grafana/provisioning:/etc/grafana/provisioning
     ports:
       - "4000:3000"
 
