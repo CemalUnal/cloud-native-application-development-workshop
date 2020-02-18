@@ -2,9 +2,7 @@ version: '3'
 services:
 
   fluentd:
-    build: ./fluentd
-    volumes:
-      - ./fluentd/conf:/fluentd/etc
+    image: cunal/fluentd:v1.6-debian-1-elasticsearch
     container_name: fluentd
     networks:
       - demo-compose-network
