@@ -49,49 +49,27 @@ Docker for Windows already includes Docker Compose.
 
 ### Installing Kubernetes Locally
 
+#### Using Minikube
+
+#### Linux
+
+
+#### Mac
+
+```bash
+brew install minikube
+```
+
+```bash
+minikube start --vm-driver=hyperkit
+```
+
+#### Windows
+
+
 TODO: minikube guide will be here.
 
 TODO: update mongo manifests according to minikube volume management
-
-We can spin up a Kubernetes locally for demo purposes.
-
-### Using Kubernetes in Docker(kind)
-It is already installed on your machines. You can restart it by executing the following command in your terminal:
-
-```bash
-docker ps -a
-
-CONTAINER ID        IMAGE                   CREATED             STATUS                 NAMES
-03730892123c        kindest/node:v1.14.2   8 days ago      Exited (130) 4 days ago  kind-control-plane
-
-docker restart kind-control-plane
-```
-
-You can see that the with the following command:
-```bash
-docker ps
-```
-
-If it does not start, then remove the kind-control-plane container:
-
-```bash
-docker rm -f kind-control-plane
-```
-
-Recrate the cluster:
-
-```bash
-cd ~/go/bin/
-./kind create cluster
-export KUBECONFIG="$(./kind get kubeconfig-path --name="kind")"
-```
-
-Check everything is working properly:
-
-```bash
-kubectl cluster-info
-kubectl get nodes -owide
-```
 
 ## Running the Sample Application
 
