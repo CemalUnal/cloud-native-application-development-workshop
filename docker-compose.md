@@ -1,6 +1,6 @@
 # Docker Compose Manifests for the Sample Application
 
-You can start the demo application by running the `start.sh` script:
+Detailed information is omitted in this section since each step is explained in detail in the [docker.md](docker.md). You can start the demo application by running the `start.sh` script:
 
 ```bash
 bash start.sh --compose
@@ -27,38 +27,8 @@ ebf2003a7726        docker.elastic.co/elasticsearch/elasticsearch:7.2.0   "/usr/
 e14dd564eb76        kibana:7.2.0                                          "/usr/local/bin/kiba…"   5 hours ago         Up 5 hours             0.0.0.0:5601->5601/tcp                                                                                                                                                                             kibana
 ```
 
-## Resource Monitoring
-[DockProm](https://github.com/stefanprodan/dockprom) project is used to monitor docker host and containers that are running on that host. Please consult to [this](https://github.com/stefanprodan/dockprom/blob/master/README.md) documentation for further information.
-
-
-## Log Aggeration & Filtering
-Elasticsearch, Fluentd and Kibana are used to aggregate and filter the logs of running containers.
-
-TODO: multiline log filtering
-TODO: try to explain this section in more detail
-
-## Request Tracing
-
-[Jaeger](https://www.jaegertracing.io/) is used with API Gateway to trace requests.
-
-
-You can access to each service with the following addresses:
-
-    - Kibana UI
-        Address: http://localhost:5601
-
-    - Grafana UI
-        Address: http://localhost:4000
-        username: admin
-        password: admin
-        Dashboard1: http://localhost:4000/d/OBa6sQ8Zk/docker-containers
-        Dashboard2: http://localhost:4000/d/wQaesQUZz/docker-host
-        Dashboard3: http://localhost:4000/d/Feaesw8Wz/monitor-services
-
-    - Jaeger UI
-        Address: http://localhost:16686/search
-
 ### Tear Down
+
 To delete everything, you can execute the following command
 
 ```bash

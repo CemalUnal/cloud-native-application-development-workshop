@@ -9,7 +9,6 @@ services:
     restart: on-failure
     ports:
       - "24224:24224"
-      - "24224:24224/udp"
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.2.0

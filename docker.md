@@ -5,13 +5,13 @@ Create a network that is called `demo-network`:
 docker network create demo-network
 ```
 
-## Deploy Log Aggeration & Filtering Architecture
+## Deploy Log Aggeration & Filtering Infrastructure
 
 Following services are used to aggregate and filter the logs of running containers:
 
-    - Elasticsearch  -  
-    - Fluentd        -  Aggregate logs and push them to Elasticsearch
-    - Kibana         -  Visualize logs
+    - Elasticsearch  #  
+    - Fluentd        #  Aggregate logs and push them to Elasticsearch
+    - Kibana         #  Visualize logs
 
 Deploy Elasticsearch:
 
@@ -28,13 +28,10 @@ docker run -p 9200:9200 -d --network=demo-network \
 
 Deploy Fluentd:
 
-TODO: is udp required ?
 ```bash
-docker run -p "24224:24224" -p "24224:24224/udp" -d --network=demo-network \
+docker run -p 24224:24224 -d --network=demo-network \
             --name fluentd \
-            -v $(pwd)/docker-manifests/logging/fluentd/conf:/fluentd/etc \
             --restart=on-failure \
-            --log-driver=fluentd --log-opt fluentd-address=localhost:24224 \
             cunal/fluentd:v1.6-debian-1-elasticsearch
 ```
 
@@ -50,6 +47,7 @@ docker run -p 5601:5601 -d --network=demo-network \
 ```
 
 ## Deploy Resource Monitoring Infrastructure
+[DockProm](https://github.com/stefanprodan/dockprom) project is used to monitor docker host and containers that are running on that host.
 
 Deploy Prometheus:
 
@@ -91,6 +89,7 @@ docker run -d --network=demo-network \
 
 Deploy cAdvisor:
 
+TODO: does it work without cgroup on Linux ?
 ```bash
 docker run -d --network=demo-network \
             --name cadvisor \
@@ -99,7 +98,6 @@ docker run -d --network=demo-network \
             -v /var/run:/var/run:rw \
             -v /sys:/sys:ro \
             -v /var/lib/docker/:/var/lib/docker:ro \
-            -v /cgroup:/cgroup:ro \
             --restart=on-failure \
             --log-driver=fluentd --log-opt fluentd-address=localhost:24224 \
             google/cadvisor:v0.33.0
@@ -111,20 +109,18 @@ Deploy Grafana:
 docker volume create --name grafana_data
 docker run -d --network=demo-network \
             --name grafana \
-            --entrypoint /setup.sh \
             -p 4000:3000 \
-            -v $(pwd)/docker-manifests/monitoring/grafana/datasources:/etc/grafana/datasources \
-            -v $(pwd)/docker-manifests/monitoring/grafana/dashboards:/etc/grafana/dashboards \
-            -v $(pwd)/docker-manifests/monitoring/grafana/setup.sh:/setup.sh \
+            -v grafana_data:/var/lib/grafana \
+            -v $(pwd)/docker-manifests/monitoring/grafana/provisioning:/etc/grafana/provisioning \
             -e GF_SECURITY_ADMIN_USER=admin \
-            -e GF_USERS_ALLOW_SIGN_UP=false \
             -e GF_SECURITY_ADMIN_PASSWORD=admin \
+            -e GF_USERS_ALLOW_SIGN_UP=false \
             --restart=on-failure \
             --log-driver=fluentd --log-opt fluentd-address=localhost:24224 \
             grafana/grafana:6.3.6
 ```
 
-## Deploy Sample Crud Application
+## Deploy Sample CRUD Application
 
 Create a volume for MongoDB and run its container.
 ```bash
@@ -139,7 +135,7 @@ docker run -p 27017:27017 -d --network=demo-network \
 
 Run Backend:
 ```bash
-docker run -p 8087:80 -d --network=demo-network \
+docker run -d --network=demo-network \
             --name backend \
             -e MONGODB_URI="mongodb://mongodb:27017/sample-app" \
             -e JAVA_OPTS="-Dspring.profiles.active=deployment -Dserver.port=80 -Xms125m -Xmx250m" \
@@ -193,6 +189,17 @@ docker run -p 5000:5000 -d --network=demo-network \
             cunal/demo-frontend:v0.0.1
 ```
 
+Run MongoDB exporter in order to expose MongoDB metrics to be scraped by Prometheus later on:
+
+```bash
+docker run -d --network=demo-network \
+            --name mongodb-exporter \
+            -e MONGODB_URI=mongodb://mongodb:27017 \
+            --restart=on-failure \
+            --log-driver=fluentd --log-opt fluentd-address=localhost:24224 \
+            cunal/mongodb-exporter:latest
+```
+
 Check everything is working properly:
 
 ```
@@ -215,6 +222,20 @@ e14dd564eb76        kibana:7.2.0                                          "/usr/
 
 ```
 
+You can access to each service with the following addresses:
+
+    - Kibana UI
+        Address: http://localhost:5601
+
+    - Grafana UI
+        Address: http://localhost:4000
+        username: admin
+        password: admin
+
+    - Jaeger UI
+        Address: http://localhost:16686/search
+
+
 ## Tear Down
 
 Stop running containers:
@@ -231,7 +252,8 @@ for container in frontend \
                  grafana \
                  cadvisor \
                  nodeexporter \
-                 prometheus
+                 prometheus \
+                 mongodb-exporter
 do
     docker stop $container
 done
@@ -251,7 +273,8 @@ for container in frontend \
                  grafana \
                  cadvisor \
                  nodeexporter \
-                 prometheus
+                 prometheus \
+                 mongodb-exporter
 do
     docker rm -f $container
 done

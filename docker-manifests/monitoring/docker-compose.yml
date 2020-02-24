@@ -61,7 +61,7 @@ services:
       - /var/run:/var/run:rw
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
-      - /cgroup:/cgroup:ro # only for Linux
+      # - /cgroup:/cgroup:ro # only for Linux
     ports:
       - "8070:8080"
 
