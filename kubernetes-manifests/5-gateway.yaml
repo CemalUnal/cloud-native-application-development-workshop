@@ -4,6 +4,7 @@ metadata:
   name: gateway-cm
   namespace: k8s-demo
 data:
+  SERVER_PORT: "80"
   SIMPLE_BACKEND_SERVICE: "http://simple-backend-deployment-service"
   JAVA_OPTS: "-Dspring.profiles.active=deployment -Dserver.port=80 -Xms125m -Xmx250m"
 

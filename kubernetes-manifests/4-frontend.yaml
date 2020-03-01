@@ -4,6 +4,7 @@ metadata:
   name: simple-frontend-cm
   namespace: k8s-demo
 data:
+  SERVER_PORT: "5000"
   REACT_APP_BACKEND_URI: "http://localhost:9091/api/simple-backend"
 
 ---
@@ -47,7 +48,7 @@ spec:
         app: simple-frontend-deployment
     spec:
       containers:
-        - image: cunal/demo-frontend:v0.0.1
+        - image: cunal/demo-frontend:v0.0.2
           imagePullPolicy: IfNotPresent
           resources:
             requests:

@@ -4,6 +4,7 @@ metadata:
   name: simple-backend-cm
   namespace: k8s-demo
 data:
+  SERVER_PORT: "80"
   MONGODB_URI: "mongodb://mongo-deployment.k8s-demo.svc.cluster.local:27017/sample-app"
   JAVA_OPTS: "-Dspring.profiles.active=deployment -Dserver.port=80 -Xms125m -Xmx250m"
 

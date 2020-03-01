@@ -2,9 +2,7 @@
 
 ## Repository Structure
 
-- [sample-app](./sample-app) contains a sample CRUD application that is ready to be deployed as Docker containers.
-- [docker-manifests](./docker-manifests) contains the Docker Compose manifests for the sample application.
-- [kubernetes-manifests](./kubernetes-manifests) contains the Kubernetes manifests for the sample application.
+- [docker-manifests](./docker-manifests) and [kubernetes-manifests](./kubernetes-manifests) directories contain Docker Compose and Kubernetes manifests for the sample application that is available in [this repository](https://github.com/cemalunal/sample-crud-app).
 - [docker-compose.md](./docker-compose.md) describes how the sample application can be run locally using Docker Compose.
 - [kubernetes.md](./kubernetes.md) describes how the sample application can be deployed to a Kubernetes cluster.
 
