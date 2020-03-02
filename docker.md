@@ -175,6 +175,12 @@ docker run -p 9091:80 -d --network=demo-network \
             -e SIMPLE_BACKEND_SERVICE="http://backend" \
             -e JAVA_OPTS="-Dspring.profiles.active=deployment -Dserver.port=80 -Xms125m -Xmx250m" \
             -e ZIPKIN_BASE_URL="http://jaeger:9411" \
+            -e REDIS_HOST="redis" \
+            -e REDIS_PORT="6379" \
+            -e RATE_LIMIT_ENABLED="true" \
+            -e RATE_LIMIT_REPOSITORY="REDIS" \
+            -e RATE_LIMIT="10" \
+            -e RATE_LIMIT_REFRESH_INTERVAL="1" \
             --restart=on-failure \
             --log-driver=fluentd --log-opt fluentd-address=localhost:24224 \
             cunal/demo-gateway:v0.0.2

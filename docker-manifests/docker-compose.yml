@@ -50,6 +50,12 @@ services:
       - SIMPLE_BACKEND_SERVICE=http://backend
       - JAVA_OPTS=-Dspring.profiles.active=deployment -Dserver.port=80 -Xms125m -Xmx250m
       - ZIPKIN_BASE_URL=http://jaeger:9411
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - RATE_LIMIT_ENABLED=true
+      - RATE_LIMIT_REPOSITORY=REDIS
+      - RATE_LIMIT=10
+      - RATE_LIMIT_REFRESH_INTERVAL=1
     ports:
       - "9091:80"
 
@@ -67,7 +73,22 @@ services:
       - mongodb_data:/data/db
     ports:
       - "27017"
-  
+
+  redis:
+    image: redis:5.0.6
+    container_name: redis
+    restart: on-failure
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+    networks:
+      - demo-compose-network
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379"
+
   jaeger:
     image: jaegertracing/all-in-one:1.14
     container_name: jaeger
@@ -119,4 +140,5 @@ networks:
 
 volumes:
   mongodb_data: {}
+  redis_data: {}
   jaeger_badger_data: {}
