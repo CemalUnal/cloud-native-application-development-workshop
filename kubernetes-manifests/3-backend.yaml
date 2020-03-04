@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: simple-backend-cm
+  name: demo-backend-cm
   namespace: k8s-demo
 data:
   SERVER_PORT: "80"
@@ -13,25 +13,25 @@ data:
 apiVersion: v1
 kind: Service
 metadata:
-  name: simple-backend-deployment-service
+  name: demo-backend-deployment-service
   namespace: k8s-demo
   labels:
-    app: simple-backend-deployment
+    app: demo-backend-deployment
 spec:
   type: ClusterIP
   ports:
     - port: 80
   selector:
-    app: simple-backend-deployment
+    app: demo-backend-deployment
 
 ---
 
 apiVersion: apps/v1
 kind: Deployment
 metadata: 
-  name: simple-backend-deployment
+  name: demo-backend-deployment
   labels:        
-    app: simple-backend-deployment
+    app: demo-backend-deployment
   namespace: k8s-demo
 spec: 
   replicas: 1
@@ -42,14 +42,14 @@ spec:
       maxUnavailable: 0
   selector:
     matchLabels:
-      app: simple-backend-deployment
+      app: demo-backend-deployment
   template: 
     metadata:
       labels:        
-        app: simple-backend-deployment
+        app: demo-backend-deployment
     spec:
       containers:
-        - image: cunal/demo-backend:v0.0.1
+        - image: cunal/demo-backend:v0.0.2
           imagePullPolicy: IfNotPresent
           resources:
             requests:
@@ -58,25 +58,25 @@ spec:
             limits:
               memory: "300Mi"
               cpu: "500m"
-          name: simple-backend-deployment
+          name: demo-backend-deployment
           ports: 
             - containerPort: 80
           envFrom:
           - configMapRef:
-              name: simple-backend-cm
+              name: demo-backend-cm
 
 ---
 
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: simple-backend-hpa
+  name: demo-backend-hpa
   namespace: k8s-demo
 spec:
   scaleTargetRef:
     apiVersion: extensions/v1beta1
     kind: Deployment
-    name: simple-backend-deployment
+    name: demo-backend-deployment
   minReplicas: 1
   maxReplicas: 3
   metrics:

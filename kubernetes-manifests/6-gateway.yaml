@@ -5,7 +5,7 @@ metadata:
   namespace: k8s-demo
 data:
   SERVER_PORT: "80"
-  SIMPLE_BACKEND_SERVICE: "http://simple-backend-deployment-service"
+  DEMO_BACKEND_SERVICE: "http://demo-backend-deployment-service"
   JAVA_OPTS: "-Dspring.profiles.active=deployment -Dserver.port=80 -Xms125m -Xmx250m"
   REDIS_HOST: "redis"
   REDIS_PORT: "6379"
@@ -55,7 +55,7 @@ spec:
         app: gateway-deployment
     spec:
       containers:
-        - image: cunal/demo-gateway:v0.0.2
+        - image: cunal/demo-gateway:v0.0.3
           imagePullPolicy: IfNotPresent
           resources:
             requests:
