@@ -2,16 +2,16 @@
 
 ## Repository Structure
 
-- [Slides](./slides) contains the slides that are used in the workshop.
-    - [part-1](./slides/part-1.pdf) An Introduction to Docker & 12 Factor App Implementation Using Docker
+- [slides](./slides) directory contains the slides that are used in the workshop.
+    - [Part-1 An Introduction to Docker & 12 Factor App Implementation Using Docker](./slides/part-1.pdf)
         - A brief introduction to Docker
         - 12 Factor App implementation using Docker (Sample CRUD application deployment)
-    - [part-2](./slides/part-2.pdf) Monitoring with Prometheus
-        - What is monitoring and why does is important for us ?
-        - A brief introduction to Prometheus and how can it be used to monitor applications ?
+    - [Part-2 Monitoring with Prometheus](./slides/part-2.pdf)
+        - What is monitoring and why does it important for us ?
+        - A brief introduction to Prometheus and how can it be used to monitor applications
         - Which metrics to monitor ?
-        - Alerting
-    - [part-3](./slides/part-3.pdf) Cloud Native Application Development on Kubernetes
+        - Alerting based on Observed Metrics
+    - [Part-3 Cloud Native Application Development on Kubernetes](./slides/part-3.pdf)
         - A brief introduction to Kubernetes and Kubernetes concepts
         - Sample CRUD application deployment using Kubernetes
         - Container locality in Kubernetes
@@ -97,11 +97,6 @@ minikube start --vm-driver=hyperkit
 
 #### Windows
 
-
-TODO: minikube guide will be here.
-
-TODO: update mongo manifests according to minikube volume management
-
 ## Running the Sample Application
 
 ### Pure Docker Way
@@ -115,4 +110,3 @@ Please continue reading from [this documentation](./docker-compose.md) in order 
 ### Kubernetes Way
 
 Please continue reading from [this documentation](./kubernetes.md) in order to deploy sample application using Kubernetes.
-
