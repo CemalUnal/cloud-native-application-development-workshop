@@ -167,6 +167,18 @@ docker run -d --network=demo-network -p 5775:5775 \
             jaegertracing/all-in-one:1.14
 ```
 
+Run Redis:
+
+```bash
+docker volume create --name redis_data
+docker run -p 6379:6379 -d --network=demo-network \
+            --name redis \
+            -v redis_data:/data \
+            --restart=on-failure \
+            --log-driver=fluentd --log-opt fluentd-address=localhost:24224 \
+            redis:5.0.6
+```
+
 Run Gateway:
 ```bash
 docker run -p 9091:80 -d --network=demo-network \
@@ -187,7 +199,6 @@ docker run -p 9091:80 -d --network=demo-network \
 ```
 
 Run Frontend:
-
 ```bash
 docker run -p 5000:5000 -d --network=demo-network \
             --name frontend \
@@ -199,7 +210,6 @@ docker run -p 5000:5000 -d --network=demo-network \
 ```
 
 Run MongoDB exporter in order to expose MongoDB metrics to be scraped by Prometheus later on:
-
 ```bash
 docker run -d --network=demo-network \
             --name mongodb-exporter \
@@ -275,6 +285,7 @@ for container in frontend \
                  jaeger \
                  backend \
                  mongodb \
+                 redis \
                  kibana \
                  fluentd \
                  elasticsearch \
@@ -295,6 +306,7 @@ for volume in   elasticsearch_data \
                 grafana_data \
                 jaeger_badger_data \
                 mongodb_data \
+                redis_data \
                 prometheus_data
 do
     docker volume rm $volume
