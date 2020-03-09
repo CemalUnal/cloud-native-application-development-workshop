@@ -3,27 +3,27 @@
 ## Repository Structure
 
 - [slides](./slides) directory contains the slides that are used in the workshop.
-    - [Part-1 An Introduction to Docker & 12 Factor App Implementation Using Docker](./slides/part-1.pdf)
+    - [Part-1 An Introduction to Docker & 12 Factor App Implementation Using Docker](./slides/an-introduction-to-docker-and-12-app-implementation-using-docker.pdf)
         - A brief introduction to Docker
         - 12 Factor App implementation using Docker (Sample CRUD application deployment)
-    - [Part-2 Monitoring with Prometheus](./slides/part-2.pdf)
+    - Part-2 Monitoring with Prometheus
         - What is monitoring and why does it important for us ?
         - A brief introduction to Prometheus and how can it be used to monitor applications
         - Which metrics to monitor ?
         - Alerting based on Observed Metrics
-    - [Part-3 Cloud Native Application Development on Kubernetes](./slides/part-3.pdf)
+    - [Part-3 Cloud Native Application Development on Kubernetes](./slides/cloud-native-application-development-on-kubernetes.pdf)
         - A brief introduction to Kubernetes and Kubernetes concepts
         - Sample CRUD application deployment using Kubernetes
         - Container locality in Kubernetes
         - Multi-tenancy in Kubernetes
 - [docker-manifests](./docker-manifests) and [kubernetes-manifests](./kubernetes-manifests) directories contain Docker Compose and Kubernetes manifests for the sample application that is available in [this repository](https://github.com/cemalunal/sample-crud-app).
-- [docker.md](./docker.md) describes how the sample application can be run locally using `docker run` commands in detail.
+- [12-factor-implementation-using-docker.md](./12-factor-implementation-using-docker.md) describes how the sample application can be run locally using `docker run` commands in detail by following [12 Factor App methodology](https://12factor.net/).
 - [docker-compose.md](./docker-compose.md) describes how the sample application can be run locally using Docker Compose.
 - [kubernetes.md](./kubernetes.md) describes how the sample application can be deployed to a Kubernetes cluster.
 
 ## Setting the Environment
 
-### Prerequisites for [part-1](./slides/part-1.pdf) and [part-2](./slides/part-2.pdf):
+### Prerequisites for [part-1](./slides/an-introduction-to-docker-and-12-app-implementation-using-docker.pdf) and part-2:
 
 * git 2.20.1+
 * docker 19.03.2+
@@ -77,13 +77,13 @@ Docker for Mac already includes Docker Compose.
 #### Windows
 Docker for Windows already includes Docker Compose.
 
-### Prerequisites for the [part-3](./slides/part-3.pdf):
+### Prerequisites for the [part-3](./slides/cloud-native-application-development-on-kubernetes.pdf):
 ### Installing Kubernetes Locally
 
 #### Using Minikube
 
 #### Linux
-
+TBD
 
 #### Mac
 
@@ -96,17 +96,17 @@ minikube start --vm-driver=hyperkit
 ```
 
 #### Windows
+TBD
 
 ## Running the Sample Application
 
-### Pure Docker Way
+### PART-1
 
-Please continue reading from [this documentation](./docker.md) in order to deploy sample application using `docker run`.
+[12-factor-implementation-using-docker.md](./12-factor-implementation-using-docker.md) in order to deploy sample application along with log aggregation / filtering infrastructure using `docker run` commands. Also the Docker Compose guide of the sample application is available in [this documentation](./docker-compose.md).
 
-### Docker Compose Way
+### PART-2
 
-Please continue reading from [this documentation](./docker-compose.md) in order to deploy sample application using Docker Compose.
+[monitoring-with-prometheus.md](./monitoring-with-prometheus.md) describes the deployment of the monitoring infrastructure using `docker run` commands along with sample Prometheus queries and alert rules.
 
-### Kubernetes Way
-
-Please continue reading from [this documentation](./kubernetes.md) in order to deploy sample application using Kubernetes.
+### PART-3
+[kubernetes.md](./kubernetes.md) describes the deployment steps of the sample application on top of Kubernetes.

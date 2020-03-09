@@ -9,8 +9,8 @@ docker network create demo-network
 
 Following services are used to aggregate and filter the logs of running containers:
 
-    - Elasticsearch  #  
     - Fluentd        #  Aggregate logs and push them to Elasticsearch
+    - Elasticsearch  #  Store log data
     - Kibana         #  Visualize logs
 
 Deploy Elasticsearch:
@@ -46,81 +46,7 @@ docker run -p 5601:5601 -d --network=demo-network \
             kibana:7.2.0
 ```
 
-## Deploy Resource Monitoring Infrastructure
-[DockProm](https://github.com/stefanprodan/dockprom) project is used to monitor docker host and containers that are running on that host.
-
-Deploy Prometheus:
-
-```bash
-docker volume create --name prometheus_data
-docker run -d --network=demo-network \
-            --name prometheus \
-            -p 9090:9090 \
-            -v $(pwd)/docker-manifests/monitoring/prometheus/:/etc/prometheus/ \
-            -v prometheus_data:/prometheus \
-            --restart=on-failure \
-            --log-driver=fluentd --log-opt fluentd-address=localhost:24224 \
-            prom/prometheus:v2.12.0 \
-            '--config.file=/etc/prometheus/prometheus.yml' \
-            '--storage.tsdb.path=/prometheus' \
-            '--web.console.libraries=/etc/prometheus/console_libraries' \
-            '--web.console.templates=/etc/prometheus/consoles' \
-            '--storage.tsdb.retention.time=200h' \
-            '--web.enable-lifecycle'
-```
-
-Deploy Node Exporter:
-
-```bash
-docker run -d --network=demo-network \
-            --name nodeexporter \
-            -p 9100:9100 \
-            -v /proc:/host/proc:ro \
-            -v /sys:/host/sys:ro \
-            -v /:/rootfs:ro \
-            --restart=on-failure \
-            --log-driver=fluentd --log-opt fluentd-address=localhost:24224 \
-            prom/node-exporter:v0.18.1 \
-            '--path.procfs=/host/proc' \
-            '--path.rootfs=/rootfs' \
-            '--path.sysfs=/host/sys' \
-            '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
-```
-
-Deploy cAdvisor:
-
-TODO: does it work without cgroup on Linux ?
-```bash
-docker run -d --network=demo-network \
-            --name cadvisor \
-            -p 8070:8080 \
-            -v /:/rootfs:ro \
-            -v /var/run:/var/run:rw \
-            -v /sys:/sys:ro \
-            -v /var/lib/docker/:/var/lib/docker:ro \
-            --restart=on-failure \
-            --log-driver=fluentd --log-opt fluentd-address=localhost:24224 \
-            google/cadvisor:v0.33.0
-```
-
-Deploy Grafana:
-
-```bash
-docker volume create --name grafana_data
-docker run -d --network=demo-network \
-            --name grafana \
-            -p 4000:3000 \
-            -v grafana_data:/var/lib/grafana \
-            -v $(pwd)/docker-manifests/monitoring/grafana/provisioning:/etc/grafana/provisioning \
-            -e GF_SECURITY_ADMIN_USER=admin \
-            -e GF_SECURITY_ADMIN_PASSWORD=admin \
-            -e GF_USERS_ALLOW_SIGN_UP=false \
-            --restart=on-failure \
-            --log-driver=fluentd --log-opt fluentd-address=localhost:24224 \
-            grafana/grafana:6.3.6
-```
-
-## Deploy Sample CRUD Application
+## Deploy the Application
 
 Create a volume for MongoDB and run its container.
 ```bash
@@ -143,28 +69,6 @@ docker run -d --network=demo-network \
             --restart=on-failure \
             --log-driver=fluentd --log-opt fluentd-address=localhost:24224 \
             cunal/demo-backend:v0.0.2
-```
-
-Run Jaeger in order to collect and trace requests:
-```bash
-docker volume create --name jaeger_badger_data
-docker run -d --network=demo-network -p 5775:5775 \
-            --name jaeger \
-            -p 6831:6831 \
-            -p 6832:6832 \
-            -p 5778:5778 \
-            -p 16686:16686 \
-            -p 14268:14268 \
-            -p 9411:9411 \
-            -e COLLECTOR_ZIPKIN_HTTP_PORT=9411 \
-            -e SPAN_STORAGE_TYPE=badger \
-            -e BADGER_EPHEMERAL=false \
-            -e BADGER_DIRECTORY_VALUE="/badger/data" \
-            -e BADGER_DIRECTORY_KEY="/badger/key" \
-            -v jaeger_badger_data:/badger \
-            --restart=on-failure \
-            --log-driver=fluentd --log-opt fluentd-address=localhost:24224 \
-            jaegertracing/all-in-one:1.14
 ```
 
 Run Redis:
@@ -209,16 +113,6 @@ docker run -p 5000:5000 -d --network=demo-network \
             cunal/demo-frontend:v0.0.3
 ```
 
-Run MongoDB exporter in order to expose MongoDB metrics to be scraped by Prometheus later on:
-```bash
-docker run -d --network=demo-network \
-            --name mongodb-exporter \
-            -e MONGODB_URI=mongodb://mongodb:27017 \
-            --restart=on-failure \
-            --log-driver=fluentd --log-opt fluentd-address=localhost:24224 \
-            cunal/mongodb-exporter:latest
-```
-
 Check everything is working properly:
 
 ```
@@ -229,7 +123,6 @@ CONTAINER ID        IMAGE                                                 COMMAN
 a33026d9820a        cunal/demo-gateway:v0.0.3                             "/bin/sh -c 'java ${…"   5 hours ago         Up 5 hours             0.0.0.0:9091->80/tcp                                                                                                                                                                               gateway
 11f2da17700f        mongo:4.0.2                                           "docker-entrypoint.s…"   5 hours ago         Up 5 hours             0.0.0.0:32777->27017/tcp                                                                                                                                                                           mongodb
 cb07f9b7f7fb        cunal/demo-frontend:v0.0.3                            "docker-entrypoint.s…"   5 hours ago         Up 5 hours             0.0.0.0:5000->5000/tcp                                                                                                                                                                             frontend
-97e255eac655        jaegertracing/all-in-one:1.14                         "/go/bin/all-in-one-…"   5 hours ago         Up 5 hours             0.0.0.0:5775->5775/tcp, 5775/udp, 0.0.0.0:5778->5778/tcp, 0.0.0.0:6831-6832->6831-6832/tcp, 0.0.0.0:9411->9411/tcp, 0.0.0.0:14268->14268/tcp, 6831-6832/udp, 0.0.0.0:16686->16686/tcp, 14250/tcp   jaeger
 d086480cd8b8        cunal/demo-backend:v0.0.2                             "/bin/sh -c 'java ${…"   5 hours ago         Up 5 hours             0.0.0.0:32778->80/tcp                                                                                                                                                                              backend
 6b37f368c060        prom/node-exporter:v0.18.1                            "/bin/node_exporter …"   5 hours ago         Up 5 hours             0.0.0.0:9100->9100/tcp                                                                                                                                                                             nodeexporter
 8c30df5cc20b        prom/prometheus:v2.12.0                               "/bin/prometheus --c…"   5 hours ago         Up 5 hours             0.0.0.0:9090->9090/tcp                                                                                                                                                                             prometheus
@@ -251,9 +144,6 @@ You can access to each service with the following addresses:
         username: admin
         password: admin
 
-    - Jaeger UI: http://localhost:16686/search
-
-
 ## Tear Down
 
 Stop running containers:
@@ -261,17 +151,12 @@ Stop running containers:
 ```bash
 for container in frontend \
                  gateway \
-                 jaeger \
                  backend \
                  mongodb \
+                 redis \
                  kibana \
                  fluentd \
-                 elasticsearch \
-                 grafana \
-                 cadvisor \
-                 nodeexporter \
-                 prometheus \
-                 mongodb-exporter
+                 elasticsearch
 do
     docker stop $container
 done
@@ -282,18 +167,12 @@ Remove running containers:
 ```bash
 for container in frontend \
                  gateway \
-                 jaeger \
                  backend \
                  mongodb \
                  redis \
                  kibana \
                  fluentd \
-                 elasticsearch \
-                 grafana \
-                 cadvisor \
-                 nodeexporter \
-                 prometheus \
-                 mongodb-exporter
+                 elasticsearch
 do
     docker rm -f $container
 done
@@ -303,11 +182,8 @@ Remove created volumes:
 
 ```bash
 for volume in   elasticsearch_data \
-                grafana_data \
-                jaeger_badger_data \
                 mongodb_data \
-                redis_data \
-                prometheus_data
+                redis_data
 do
     docker volume rm $volume
 done
