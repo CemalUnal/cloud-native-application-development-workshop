@@ -48,7 +48,7 @@ spec:
         app: demo-frontend-deployment
     spec:
       containers:
-        - image: cunal/demo-frontend:v0.0.3
+        - image: cunal/demo-frontend:e3869041cc2410a1875a7e02fc392bda13a17dfc
           imagePullPolicy: IfNotPresent
           resources:
             requests:

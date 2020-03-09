@@ -29,14 +29,14 @@ function start_with_compose {
     fi
 
     echo "Deploying monitoring infrastructure..."
-    for service in "docker-manifests/logging/docker-compose.yml" \
-                "docker-manifests/monitoring/docker-compose.yml";
+    for service in "docker-compose-manifests/logging/docker-compose.yml" \
+                "docker-compose-manifests/monitoring/docker-compose.yml";
     do
         docker-compose -f $service up -d
     done
 
     echo "Deploying Sample App using Docker Compose..."
-    docker-compose -f docker-manifests/docker-compose.yml up -d
+    docker-compose -f docker-compose-manifests/docker-compose.yml up -d
 }
 
 function start_with_kubernetes {

@@ -12,14 +12,22 @@
         - Which metrics to monitor ?
         - Alerting based on Observed Metrics
     - [Part-3 Cloud Native Application Development on Kubernetes](./slides/cloud-native-application-development-on-kubernetes.pdf)
-        - A brief introduction to Kubernetes and Kubernetes concepts
+        - A brief introduction to Kubernetes and its concepts
         - Sample CRUD application deployment using Kubernetes
         - Container locality in Kubernetes
         - Multi-tenancy in Kubernetes
-- [docker-manifests](./docker-manifests) and [kubernetes-manifests](./kubernetes-manifests) directories contain Docker Compose and Kubernetes manifests for the sample application that is available in [this repository](https://github.com/cemalunal/sample-crud-app).
+
+- [example-docker-commands](./example-docker-commands) contains sample Docker commands that will get you familiar with Docker concepts and its CLI usage.
+
+- [docker-compose-manifests](./docker-compose-manifests) and [kubernetes-manifests](./kubernetes-manifests) directories contain Docker Compose and Kubernetes manifests for the sample application that is available in [this repository](https://github.com/cemalunal/sample-crud-app).
+
 - [12-factor-implementation-using-docker.md](./12-factor-implementation-using-docker.md) describes how the sample application can be run locally using `docker run` commands in detail by following [12 Factor App methodology](https://12factor.net/).
+
 - [docker-compose.md](./docker-compose.md) describes how the sample application can be run locally using Docker Compose.
+
 - [kubernetes.md](./kubernetes.md) describes how the sample application can be deployed to a Kubernetes cluster.
+
+- [monitoring-with-prometheus.md](./monitoring-with-prometheus.md) describes how can we deploy a monitoring infrastructure using Prometheus.
 
 ## Setting the Environment
 
@@ -102,7 +110,15 @@ TBD
 
 ### PART-1
 
-[12-factor-implementation-using-docker.md](./12-factor-implementation-using-docker.md) in order to deploy sample application along with log aggregation / filtering infrastructure using `docker run` commands. Also the Docker Compose guide of the sample application is available in [this documentation](./docker-compose.md).
+Change your directory to `example-docker-commands`:
+
+```bash
+cd example-docker-commands
+```
+
+Then continue reading from [example-docker-commands/readme.md](./example-docker-commands/readme.md) to get familiar with Docker concepts and cli usage.
+
+After completing the examples in the above document, you can start deploying the sample application following the 12 factor app principles by continue to read [12-factor-implementation-using-docker.md](./12-factor-implementation-using-docker.md) along with log aggregation / filtering infrastructure using `docker run` commands. Also the Docker Compose guide of the sample application is available in [docker-compose.md](./docker-compose.md).
 
 ### PART-2
 

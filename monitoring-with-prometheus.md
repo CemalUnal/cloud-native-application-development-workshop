@@ -10,7 +10,7 @@ docker volume create --name prometheus_data
 docker run -d --network=demo-network \
             --name prometheus \
             -p 9090:9090 \
-            -v $(pwd)/docker-manifests/monitoring/prometheus/:/etc/prometheus/ \
+            -v $(pwd)/docker-compose-manifests/monitoring/prometheus/:/etc/prometheus/ \
             -v prometheus_data:/prometheus \
             --restart=on-failure \
             prom/prometheus:v2.12.0 \
@@ -70,7 +70,7 @@ docker run -d --network=demo-network \
             --name grafana \
             -p 4000:3000 \
             -v grafana_data:/var/lib/grafana \
-            -v $(pwd)/docker-manifests/monitoring/grafana/provisioning:/etc/grafana/provisioning \
+            -v $(pwd)/docker-compose-manifests/monitoring/grafana/provisioning:/etc/grafana/provisioning \
             -e GF_SECURITY_ADMIN_USER=admin \
             -e GF_SECURITY_ADMIN_PASSWORD=admin \
             -e GF_USERS_ALLOW_SIGN_UP=false \

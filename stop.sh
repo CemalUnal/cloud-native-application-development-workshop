@@ -18,13 +18,13 @@ done
 
 function stop_with_compose {
     echo "Removing monitoring infrastructure..."
-    for service in "docker-manifests/logging/docker-compose.yml" \
-                "docker-manifests/monitoring/docker-compose.yml";
+    for service in "docker-compose-manifests/logging/docker-compose.yml" \
+                "docker-compose-manifests/monitoring/docker-compose.yml";
     do
         docker-compose -f $service down --remove-orphans
     done
 
-    docker-compose -f docker-manifests/docker-compose.yml down --remove-orphans
+    docker-compose -f docker-compose-manifests/docker-compose.yml down --remove-orphans
 }
 
 function stop_with_kubernetes {
