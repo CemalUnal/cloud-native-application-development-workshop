@@ -53,7 +53,7 @@ By default all files created inside a container do not persist when that contain
 Start a fres PostgreSQL container:
 
 ```bash
-docker run --name postgres -d postgres:10
+docker run --name postgres -d -e POSTGRES_PASSWORD=passwd postgres:10
 ```
 
 Create a shell inside the running container:
@@ -102,12 +102,17 @@ docker rm postgres
 Again run a PostgreSQL container:
 
 ```bash
-docker run --name postgres -d postgres:10
+docker run --name postgres -d -e POSTGRES_PASSWORD=passwd postgres:10
 ```
 
 Connect to postgres database and notice that the newly created table is not persisted and deleted:
 
 ```bash
+docker exec -it postgres bash
+
+psql --user postgres
+\c postgres
+
 SELECT * FROM users;
 ERROR:  relation "users" does not exist
 ```
@@ -138,7 +143,7 @@ local               postgres_data
 Create a PostgreSQL container that uses this volume:
 
 ```bash
-docker run --name postgres -v postgres_data:/var/lib/postgresql/data -d postgres:10
+docker run --name postgres -e POSTGRES_PASSWORD=passwd -v postgres_data:/var/lib/postgresql/data -d postgres:10
 ```
 
 Connect to running PostgreSQL container and create sample table with above commands:
@@ -170,7 +175,7 @@ docker rm postgres
 Again run a PostgreSQL container that is using the same volume with the previously killed container:
 
 ```bash
-docker run --name postgres_new -v postgres_data:/var/lib/postgresql/data -d postgres:10
+docker run --name postgres_new -e POSTGRES_PASSWORD=passwd -v postgres_data:/var/lib/postgresql/data -d postgres:10
 ```
 
 Connect to postgres database and notice that the newly created table is still there with its data in it:
@@ -225,7 +230,7 @@ Start a Redis container that is attached to the `test network`:
 docker run -d --network=test-network --name=redis redis
 ```
 
-Start a Redis container that is attached to the `test network`:
+Start an Alpine linux container that is also attached to the `test network` and try to ping redis container:
 
 ```bash
 docker run --network=test-network --name=alpine alpine ping redis
@@ -247,6 +252,7 @@ If we start an alpine container that without specifying any network:
 docker run --name=alpine-test alpine ping redis
 ```
 
+ping operation fails:
 ```
 ping: bad address 'redis'
 ```

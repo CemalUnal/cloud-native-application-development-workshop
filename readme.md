@@ -106,9 +106,9 @@ minikube start --vm-driver=hyperkit
 #### Windows
 TBD
 
-## Running the Sample Application
-
 ### PART-1
+
+#### Docker Demo
 
 Change your directory to `example-docker-commands`:
 
@@ -118,7 +118,9 @@ cd example-docker-commands
 
 Then continue reading from [example-docker-commands/readme.md](./example-docker-commands/readme.md) to get familiar with Docker concepts and cli usage.
 
-After completing the examples in the above document, you can start deploying the sample application following the 12 factor app principles by continue to read [12-factor-implementation-using-docker.md](./12-factor-implementation-using-docker.md) along with log aggregation / filtering infrastructure using `docker run` commands. Also the Docker Compose guide of the sample application is available in [docker-compose.md](./docker-compose.md).
+#### 12 Factor App Implementation
+
+After completing the examples in the above document, you can continue to read from [12-factor-implementation-using-docker.md](./12-factor-implementation-using-docker.md) to start deploying the sample application by following the 12 factor app principles. Also the Docker Compose guide of the sample application is available in [docker-compose.md](./docker-compose.md).
 
 ### PART-2
 
