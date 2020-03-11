@@ -120,7 +120,15 @@ Then continue reading from [example-docker-commands/readme.md](./example-docker-
 
 #### 12 Factor App Implementation
 
-After completing the examples in the above document, you can continue to read from [12-factor-implementation-using-docker.md](./12-factor-implementation-using-docker.md) to start deploying the sample application by following the 12 factor app principles. Also the Docker Compose guide of the sample application is available in [docker-compose.md](./docker-compose.md).
+After completing the examples in the above document, you can continue to read from [12-factor-implementation-using-docker.md](./12-factor-implementation-using-docker.md) to start deploying the sample application by following the 12 factor app principles.
+
+Change your directory to root folder:
+
+```bash
+cd ..
+```
+
+Then you can start executing the commands that are available in [12-factor-implementation-using-docker.md](./12-factor-implementation-using-docker.md). Also the Docker Compose guide of the sample application is available in [docker-compose.md](./docker-compose.md).
 
 ### PART-2
 

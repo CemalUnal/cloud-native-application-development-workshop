@@ -67,7 +67,7 @@ docker run -d --network=demo-network \
             -e JAVA_OPTS="-Dspring.profiles.active=local-docker -Xms125m -Xmx250m" \
             --restart=on-failure \
             --log-driver=fluentd --log-opt fluentd-address=localhost:24224 \
-            cunal/demo-backend:e3869041cc2410a1875a7e02fc392bda13a17dfc
+            cunal/demo-backend:6685333069ec622c9c314b95f6df6cf8cc02afe0
 ```
 
 Run Redis:
@@ -97,17 +97,17 @@ docker run -p 9091:80 -d --network=demo-network \
             -e RATE_LIMIT_REFRESH_INTERVAL="1" \
             --restart=on-failure \
             --log-driver=fluentd --log-opt fluentd-address=localhost:24224 \
-            cunal/demo-gateway:e3869041cc2410a1875a7e02fc392bda13a17dfc
+            cunal/demo-gateway:6685333069ec622c9c314b95f6df6cf8cc02afe0
 ```
 
 Run Frontend:
 ```bash
-docker run -p 5000:5000 -d --network=demo-network \
+docker run -p 5000:80 -d --network=demo-network \
             --name frontend \
             -e REACT_APP_BACKEND_URI=http://localhost:9091/api/demo-backend \
             --restart=on-failure \
             --log-driver=fluentd --log-opt fluentd-address=localhost:24224 \
-            cunal/demo-frontend:e3869041cc2410a1875a7e02fc392bda13a17dfc
+            cunal/demo-frontend:6685333069ec622c9c314b95f6df6cf8cc02afe0
 ```
 
 Check everything is working properly:
@@ -115,31 +115,21 @@ Check everything is working properly:
 ```
 docker ps
 
-
-CONTAINER ID        IMAGE                                                 COMMAND                  CREATED             STATUS                 PORTS                                                                                                                                                                                              NAMES
-a33026d9820a        cunal/demo-gateway:e3869041cc2410a1875a7e02fc392bda13a17dfc                             "/bin/sh -c 'java ${…"   5 hours ago         Up 5 hours             0.0.0.0:9091->80/tcp                                                                                                                                                                               gateway
-11f2da17700f        mongo:4.0.2                                           "docker-entrypoint.s…"   5 hours ago         Up 5 hours             0.0.0.0:32777->27017/tcp                                                                                                                                                                           mongodb
-cb07f9b7f7fb        cunal/demo-frontend:e3869041cc2410a1875a7e02fc392bda13a17dfc                            "docker-entrypoint.s…"   5 hours ago         Up 5 hours             0.0.0.0:5000->5000/tcp                                                                                                                                                                             frontend
-d086480cd8b8        cunal/demo-backend:e3869041cc2410a1875a7e02fc392bda13a17dfc                             "/bin/sh -c 'java ${…"   5 hours ago         Up 5 hours             0.0.0.0:32778->80/tcp                                                                                                                                                                              backend
-6b37f368c060        prom/node-exporter:v0.18.1                            "/bin/node_exporter …"   5 hours ago         Up 5 hours             0.0.0.0:9100->9100/tcp                                                                                                                                                                             nodeexporter
-8c30df5cc20b        prom/prometheus:v2.12.0                               "/bin/prometheus --c…"   5 hours ago         Up 5 hours             0.0.0.0:9090->9090/tcp                                                                                                                                                                             prometheus
-0fbe11bbf848        grafana/grafana:6.3.6                                 "/setup.sh"              5 hours ago         Up 5 hours             0.0.0.0:4000->3000/tcp                                                                                                                                                                             grafana
-f86d659c3727        google/cadvisor:v0.33.0                               "/usr/bin/cadvisor -…"   5 hours ago         Up 5 hours (healthy)   0.0.0.0:8070->8080/tcp                                                                                                                                                                             cadvisor
-821161e55444        logging_fluentd                                       "tini -- /bin/entryp…"   5 hours ago         Up 5 hours             5140/tcp, 0.0.0.0:24224->24224/tcp, 0.0.0.0:24224->24224/udp                                                                                                                                       fluentd
-ebf2003a7726        docker.elastic.co/elasticsearch/elasticsearch:7.2.0   "/usr/local/bin/dock…"   5 hours ago         Up 5 hours             0.0.0.0:9200->9200/tcp, 9300/tcp                                                                                                                                                                   elasticsearch
-e14dd564eb76        kibana:7.2.0                                          "/usr/local/bin/kiba…"   5 hours ago         Up 5 hours             0.0.0.0:5601->5601/tcp                                                                                                                                                                             kibana
-
+CONTAINER ID        IMAGE                                                          COMMAND                  CREATED              STATUS              PORTS                                NAMES
+8ad47aa644f3        cunal/demo-frontend:6685333069ec622c9c314b95f6df6cf8cc02afe0   "docker-entrypoint.s…"   34 seconds ago       Up 33 seconds       0.0.0.0:5000->80/tcp               frontend
+e9102c555294        cunal/demo-gateway:6685333069ec622c9c314b95f6df6cf8cc02afe0    "/bin/sh -c 'java ${…"   46 seconds ago       Up 45 seconds       0.0.0.0:9091->80/tcp                 gateway
+e4ef25f71967        redis:5.0.6                                                    "docker-entrypoint.s…"   About a minute ago   Up About a minute   0.0.0.0:6379->6379/tcp               redis
+4f217f57d5e8        cunal/demo-backend:6685333069ec622c9c314b95f6df6cf8cc02afe0    "/bin/sh -c 'java ${…"   3 minutes ago        Up 2 minutes                                             backend
+f318beadce88        mongo:4.0.2                                                    "docker-entrypoint.s…"   3 minutes ago        Up 3 minutes        0.0.0.0:27017->27017/tcp             mongodb
+56da65ab05e2        kibana:7.2.0                                                   "/usr/local/bin/kiba…"   3 minutes ago        Up 3 minutes        0.0.0.0:5601->5601/tcp               kibana
+0bff5873062a        cunal/fluentd:v1.6-debian-1-elasticsearch                      "tini -- /bin/entryp…"   3 minutes ago        Up 3 minutes        5140/tcp, 0.0.0.0:24224->24224/tcp   fluentd
+633aed9cb731        docker.elastic.co/elasticsearch/elasticsearch:7.2.0            "/usr/local/bin/dock…"   3 minutes ago        Up 3 minutes        0.0.0.0:9200->9200/tcp, 9300/tcp     elasticsearch
 ```
 
-You can access to each service with the following addresses:
+You can access to the sample application and Kibana at the following addresses respectively:
 
-    - Sample CRUD Application: http://localhost:5000
-
-    - Kibana UI: http://localhost:5601
-
-    - Grafana UI: http://localhost:4000
-        username: admin
-        password: admin
+- Sample application: `http://localhost:5000`
+- Kibana: `http://localhost:5601`
 
 ## Tear Down
 
@@ -171,7 +161,7 @@ for container in frontend \
                  fluentd \
                  elasticsearch
 do
-    docker rm -f $container
+    docker rm $container
 done
 ```
 

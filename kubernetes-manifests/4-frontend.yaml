@@ -4,7 +4,6 @@ metadata:
   name: demo-frontend-cm
   namespace: k8s-demo
 data:
-  SERVER_PORT: "5000"
   REACT_APP_BACKEND_URI: "http://localhost:9091/api/demo-backend"
 
 ---
@@ -19,7 +18,7 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-    - port: 5000
+    - port: 80
   selector:
     app: demo-frontend-deployment
 
@@ -48,7 +47,7 @@ spec:
         app: demo-frontend-deployment
     spec:
       containers:
-        - image: cunal/demo-frontend:e3869041cc2410a1875a7e02fc392bda13a17dfc
+        - image: cunal/demo-frontend:6685333069ec622c9c314b95f6df6cf8cc02afe0
           imagePullPolicy: IfNotPresent
           resources:
             requests:
@@ -59,7 +58,7 @@ spec:
               cpu: "50m"
           name: demo-frontend-deployment
           ports: 
-            - containerPort: 5000
+            - containerPort: 80
           envFrom:
           - configMapRef:
               name: demo-frontend-cm

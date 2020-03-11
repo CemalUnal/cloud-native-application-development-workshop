@@ -224,13 +224,13 @@ NETWORK ID          NAME                DRIVER              SCOPE
 b1016282ac96        test-network        bridge              local
 ```
 
-Start a Redis container that is attached to the `test network`:
+Start a Redis container that is attached to the `test-network`:
 
 ```bash
 docker run -d --network=test-network --name=redis redis
 ```
 
-Start an Alpine linux container that is also attached to the `test network` and try to ping redis container:
+Start an Alpine linux container that is also attached to the `test-network` and try to ping redis container:
 
 ```bash
 docker run --network=test-network --name=alpine alpine ping redis
@@ -255,4 +255,10 @@ docker run --name=alpine-test alpine ping redis
 ping operation fails:
 ```
 ping: bad address 'redis'
+```
+
+You can stop and remove redis instance to prevent conflict with the later examples:
+```bash
+docker stop redis
+docker rm redis
 ```

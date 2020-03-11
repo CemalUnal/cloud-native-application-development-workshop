@@ -3,7 +3,7 @@ version: "3"
 services:
 
   frontend:
-    image: cunal/demo-frontend:e3869041cc2410a1875a7e02fc392bda13a17dfc
+    image: cunal/demo-frontend:6685333069ec622c9c314b95f6df6cf8cc02afe0
     container_name: frontend
     restart: on-failure
     logging:
@@ -13,13 +13,12 @@ services:
     networks:
       - demo-compose-network
     environment:
-      - SERVER_PORT=5000
       - REACT_APP_BACKEND_URI=http://localhost:9091/api/demo-backend
     ports:
-      - "5000:5000"
+      - "5000:80"
 
   backend:
-    image: cunal/demo-backend:e3869041cc2410a1875a7e02fc392bda13a17dfc
+    image: cunal/demo-backend:6685333069ec622c9c314b95f6df6cf8cc02afe0
     container_name: backend
     restart: on-failure
     logging:
@@ -35,7 +34,7 @@ services:
       - "80"
 
   gateway:
-    image: cunal/demo-gateway:e3869041cc2410a1875a7e02fc392bda13a17dfc
+    image: cunal/demo-gateway:6685333069ec622c9c314b95f6df6cf8cc02afe0
     container_name: gateway
     restart: on-failure
     logging:
