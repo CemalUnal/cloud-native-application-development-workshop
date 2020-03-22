@@ -6,11 +6,10 @@
     - [Part-1 An Introduction to Docker & 12 Factor App Implementation Using Docker](./slides/an-introduction-to-docker-and-12-app-implementation-using-docker.pdf)
         - A brief introduction to Docker
         - 12 Factor App implementation using Docker (Sample CRUD application deployment)
-    - Part-2 Monitoring with Prometheus
-        - What is monitoring and why does it important for us ?
-        - A brief introduction to Prometheus and how can it be used to monitor applications
-        - Which metrics to monitor ?
-        - Alerting based on Observed Metrics
+    - Part-2 An Introduction to Prometheus
+        - Prometheus Ecosystem and Arhchitecture
+        - Data Model and Metric Types
+        - Visualization and Alerting based on Observed Metrics
     - [Part-3 Cloud Native Application Development on Kubernetes](./slides/cloud-native-application-development-on-kubernetes.pdf)
         - A brief introduction to Kubernetes and its concepts
         - Sample CRUD application deployment using Kubernetes
