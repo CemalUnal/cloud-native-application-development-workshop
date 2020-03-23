@@ -49,7 +49,7 @@ services:
       - ZIPKIN_BASE_URL=http://jaeger:9411
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - RATE_LIMIT_ENABLED=true
+      - RATE_LIMIT_ENABLED=false
       - RATE_LIMIT_REPOSITORY=REDIS
       - RATE_LIMIT=4
       - RATE_LIMIT_REFRESH_INTERVAL=1
