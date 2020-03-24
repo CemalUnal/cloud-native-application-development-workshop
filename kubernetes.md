@@ -1,5 +1,7 @@
 # Kubernetes Manifests for the Sample Application
 
+(This section will be updated soon)
+
 You can deploy the sample application by running the `start.sh` script with `--kubernetes` flag:
 
 ```bash

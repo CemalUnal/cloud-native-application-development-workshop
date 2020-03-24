@@ -10,11 +10,11 @@
         - Prometheus Ecosystem and Architecture
         - Data Model and Metric Types
         - Visualization and Alerting based on Observed Metrics
-    - [Part-3 Cloud Native Application Development on Kubernetes](./slides/cloud-native-application-development-on-kubernetes.pdf)
+    - [Part-3 An Introduction to Kubernetes](./slides/an-introduction-to-kubernetes.pdf)
         - A brief introduction to Kubernetes and its concepts
         - Sample CRUD application deployment using Kubernetes
-        - Container locality in Kubernetes
-        - Multi-tenancy in Kubernetes
+        - Container Locality on Kubernetes
+        - Software Multi-Tenancy Using Kubernetes
 
 - [example-docker-commands](./example-docker-commands) contains sample Docker commands that will get you familiar with Docker concepts and its CLI usage.
 
@@ -30,7 +30,7 @@
 
 ## Setting the Environment
 
-### Prerequisites for [part-1](./slides/an-introduction-to-docker-and-12-app-implementation-using-docker.pdf) and part-2:
+### Prerequisites for [part-1](./slides/an-introduction-to-docker-and-12-app-implementation-using-docker.pdf) and [part-2](./slides/an-introduction-to-prometheus.pdf):
 
 * git 2.20.1+
 * docker 19.03.2+
@@ -84,7 +84,7 @@ Docker for Mac already includes Docker Compose.
 #### Windows
 Docker for Windows already includes Docker Compose.
 
-### Prerequisites for the [part-3](./slides/cloud-native-application-development-on-kubernetes.pdf):
+### Prerequisites for the [part-3](./slides/an-introduction-to-kubernetes.pdf):
 ### Installing Kubernetes Locally
 
 #### Using Minikube
@@ -131,7 +131,10 @@ Then you can start executing the commands that are available in [12-factor-imple
 
 ### PART-2
 
-[monitoring-with-prometheus.md](./monitoring-with-prometheus.md) describes the deployment of the monitoring infrastructure using `docker run` commands along with sample Prometheus queries and alert rules.
+[An Introduction to Prometheus](./introduction-to-prometheus.md) contains the installation and configuration of [Node Exporter](https://github.com/prometheus/node_exporter/blob/master/README.md), [Prometheus](https://prometheus.io/) and [AlertManager](https://prometheus.io/docs/alerting/alertmanager/). Also it describes how you can use these tools in order to monitor your local environment and create and send custom alerts using Slack.
+
+[Monitoring with Prometheus](./monitoring-with-prometheus.md) contains the deployment instructions for the monitoring infrastructure using Docker in your local environment.
 
 ### PART-3
-[kubernetes.md](./kubernetes.md) describes the deployment steps of the sample application on top of Kubernetes.
+[An Introduction to Kubernetes](./kubernetes.md) describes the deployment steps of the sample application on top of Kubernetes.
+
