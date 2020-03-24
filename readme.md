@@ -11,8 +11,7 @@
         - Data Model and Metric Types
         - Visualization and Alerting based on Observed Metrics
     - [Part-3 An Introduction to Kubernetes](./slides/an-introduction-to-kubernetes.pdf)
-        - A brief introduction to Kubernetes and its concepts
-        - Sample CRUD application deployment using Kubernetes
+        - A Brief Introduction to Kubernetes and its Building Blocks
         - Container Locality on Kubernetes
         - Software Multi-Tenancy Using Kubernetes
 
@@ -24,7 +23,7 @@
 
 - [docker-compose.md](./docker-compose.md) describes how the sample application can be run locally using Docker Compose.
 
-- [kubernetes.md](./kubernetes.md) describes how the sample application can be deployed to a Kubernetes cluster.
+- [introduction-to-kubernetes.md](./introduction-to-kubernetes.md) demonstrates the Kubernetes features.
 
 - [monitoring-with-prometheus.md](./monitoring-with-prometheus.md) describes how can we deploy a monitoring infrastructure using Prometheus.
 
@@ -85,7 +84,13 @@ Docker for Mac already includes Docker Compose.
 Docker for Windows already includes Docker Compose.
 
 ### Prerequisites for the [part-3](./slides/an-introduction-to-kubernetes.pdf):
-### Installing Kubernetes Locally
+
+Choose one of two options available below:
+
+### 1- Using a Kubernetes Playground
+[Katacoda Kubernetes Playground](https://www.katacoda.com/courses/kubernetes/playground) will be used to explore Kubernetes features. It provides two node Kubernetes cluster, one of them is master and the other one is worker. In order to use the playground you may need to create a Katacoda account.
+
+### 2- Installing Kubernetes Locally
 
 #### Using Minikube
 
@@ -121,13 +126,7 @@ Then continue reading from [example-docker-commands/readme.md](./example-docker-
 
 After completing the examples in the above document, you can continue to read from [12-factor-implementation-using-docker.md](./12-factor-implementation-using-docker.md) to start deploying the sample application by following the 12 factor app principles.
 
-Change your directory to root folder:
-
-```bash
-cd ..
-```
-
-Then you can start executing the commands that are available in [12-factor-implementation-using-docker.md](./12-factor-implementation-using-docker.md). Also the Docker Compose guide of the sample application is available in [docker-compose.md](./docker-compose.md).
+Then you can start executing the commands in the root folder of this repository that are available in [12-factor-implementation-using-docker.md](./12-factor-implementation-using-docker.md). Also the Docker Compose guide of the sample application is available in [docker-compose.md](./docker-compose.md).
 
 ### PART-2
 
@@ -136,5 +135,5 @@ Then you can start executing the commands that are available in [12-factor-imple
 [Monitoring with Prometheus](./monitoring-with-prometheus.md) contains the deployment instructions for the monitoring infrastructure using Docker in your local environment.
 
 ### PART-3
-[An Introduction to Kubernetes](./kubernetes.md) describes the deployment steps of the sample application on top of Kubernetes.
+[An Introduction to Kubernetes](./introduction-to-kubernetes.md) demonstrates the Kubernetes features like horizontal scaling, self healing, zero down-time application version update etc. 
 
