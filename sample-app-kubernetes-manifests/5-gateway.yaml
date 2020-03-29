@@ -2,13 +2,13 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: gateway-cm
-  namespace: k8s-demo
+  namespace: kubernetes-demo
 data:
   DEMO_BACKEND_SERVICE: "http://demo-backend-deployment-service"
   JAVA_OPTS: "-Dspring.profiles.active=local-docker -Xms125m -Xmx250m"
   REDIS_HOST: "redis"
   REDIS_PORT: "6379"
-  RATE_LIMIT_ENABLED: "true"
+  RATE_LIMIT_ENABLED: "false"
   RATE_LIMIT_REPOSITORY: "REDIS"
   RATE_LIMIT: "10"
   RATE_LIMIT_REFRESH_INTERVAL: "1"
@@ -19,11 +19,11 @@ apiVersion: v1
 kind: Service
 metadata:
   name: gateway-deployment-service
-  namespace: k8s-demo
+  namespace: kubernetes-demo
   labels:
     app: gateway-deployment
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   ports:
     - port: 80
   selector:
@@ -37,9 +37,9 @@ metadata:
   name: gateway-deployment
   labels:        
     app: gateway-deployment
-  namespace: k8s-demo
+  namespace: kubernetes-demo
 spec: 
-  replicas: 1
+  replicas: 3
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -56,13 +56,18 @@ spec:
       containers:
         - image: cunal/demo-gateway:6685333069ec622c9c314b95f6df6cf8cc02afe0
           imagePullPolicy: IfNotPresent
+          readinessProbe:
+            httpGet:
+              path: /api/actuator/health
+              port: 80
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            timeoutSeconds: 3
           resources:
             requests:
-              memory: "400Mi"
-              cpu: "400m"
+              cpu: "800m"
             limits:
-              memory: "800Mi"
-              cpu: "500m"
+              cpu: "1000m"
           name: gateway-deployment
           ports: 
             - containerPort: 80
@@ -76,16 +81,16 @@ apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
   name: gateway-hpa
-  namespace: k8s-demo
+  namespace: kubernetes-demo
 spec:
   scaleTargetRef:
     apiVersion: extensions/v1beta1
     kind: Deployment
     name: gateway-deployment
-  minReplicas: 1
-  maxReplicas: 3
+  minReplicas: 3
+  maxReplicas: 6
   metrics:
   - type: Resource
     resource:
       name: cpu
-      targetAverageUtilization: 70
+      targetAverageUtilization: 10

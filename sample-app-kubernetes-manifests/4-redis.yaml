@@ -1,29 +1,8 @@
-kind: PersistentVolume
-apiVersion: v1
-metadata:
-  name: redis-standalone-volume
-  namespace: k8s-demo
-  labels:
-    type: local
-spec:
-  storageClassName: manual
-  capacity:
-    storage: 1Gi
-  accessModes:
-    - ReadWriteOnce
-  claimRef:
-    name: data-redis-0
-    namespace: k8s-demo
-  hostPath:
-    path: "/data/redis"
-
----
-
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: redis
-  namespace: k8s-demo
+  namespace: kubernetes-demo
 spec:
   serviceName: redis
   replicas: 1
@@ -52,10 +31,10 @@ spec:
       name: data
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      storageClassName: manual
+      storageClassName: default
       resources:
         requests:
-          storage: 1Gi
+          storage: 500Mi
 
 ---
 
@@ -63,7 +42,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: redis
-  namespace: k8s-demo
+  namespace: kubernetes-demo
 spec:
   type: ClusterIP
   ports:

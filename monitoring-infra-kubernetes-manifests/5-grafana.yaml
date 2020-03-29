@@ -1,0 +1,2623 @@
+---
+# Source: grafana/templates/data-source.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasource
+  namespace: monitoring
+data:
+  prometheus.yaml: |
+      {
+        "apiVersion": 1,
+        "datasources": [
+            {
+                "access": "proxy",
+                "editable": false,
+                "name": "Prometheus",
+                "orgId": 1,
+                "type": "prometheus",
+                "url": "http://prometheus.monitoring.svc.cluster.local:9090",
+                "version": 1
+            }
+        ]
+      }
+---
+# Source: grafana/templates/grafana-config.yaml
+kind: ConfigMap  
+apiVersion: v1  
+metadata:  
+  name: grafana-ini
+  namespace: monitoring   
+  labels:    
+    app: grafana   
+data:
+  grafana.ini: |
+    ##################### Grafana Configuration Example #####################
+    #
+    # Everything has defaults so you only need to uncomment things you want to
+    # change
+
+    # possible values : production, development
+    ;app_mode = production
+
+    # instance name, defaults to HOSTNAME environment variable value or hostname if HOSTNAME var is empty
+    ;instance_name = ${HOSTNAME}
+
+    #################################### Paths ####################################
+    [paths]
+    # Path to where grafana can store temp files, sessions, and the sqlite3 db (if that is used)
+    ;data = /var/lib/grafana
+
+    # Temporary files in `data` directory older than given duration will be removed
+    ;temp_data_lifetime = 24h
+
+    # Directory where grafana can store logs
+    ;logs = /var/log/grafana
+
+    # Directory where grafana will automatically scan and look for plugins
+    ;plugins = /var/lib/grafana/plugins
+
+    # folder that contains provisioning config files that grafana will apply on startup and while running.
+    ;provisioning = conf/provisioning
+
+    #################################### Server ####################################
+    [server]
+    # Protocol (http, https, socket)
+    ;protocol = http
+
+    # The ip address to bind to, empty will bind to all interfaces
+    ;http_addr =
+
+    # The http port  to use
+    ;http_port = 3000
+
+    # The public facing domain name used to access grafana from a browser
+    ;domain = localhost
+
+    # Redirect to correct domain if host header does not match domain
+    # Prevents DNS rebinding attacks
+    ;enforce_domain = false
+
+    # The full public facing url you use in browser, used for redirects and emails
+    # If you use reverse proxy and sub path specify full url (with sub path)
+    ;root_url = http://localhost:3000
+
+    # Log web requests
+    ;router_logging = false
+
+    # the path relative working path
+    ;static_root_path = public
+
+    # enable gzip
+    ;enable_gzip = false
+
+    # https certs & key file
+    ;cert_file =
+    ;cert_key =
+
+    # Unix socket path
+    ;socket =
+
+    #################################### Database ####################################
+    [database]
+    # You can configure the database connection by specifying type, host, name, user and password
+    # as separate properties or as on string using the url properties.
+
+    # Either "mysql", "postgres" or "sqlite3", it's your choice
+    ;type = sqlite3
+    ;host = 127.0.0.1:3306
+    ;name = grafana
+    ;user = root
+    # If the password contains # or ; you have to wrap it with triple quotes. Ex """#password;"""
+    ;password =
+
+    # Use either URL or the previous fields to configure the database
+    # Example: mysql://user:secret@host:port/database
+    ;url =
+
+    # For "postgres" only, either "disable", "require" or "verify-full"
+    ;ssl_mode = disable
+
+    # For "sqlite3" only, path relative to data_path setting
+    ;path = grafana.db
+
+    # Max idle conn setting default is 2
+    ;max_idle_conn = 2
+
+    # Max conn setting default is 0 (mean not set)
+    ;max_open_conn =
+
+    # Connection Max Lifetime default is 14400 (means 14400 seconds or 4 hours)
+    ;conn_max_lifetime = 14400
+
+    # Set to true to log the sql calls and execution times.
+    log_queries =
+
+    # For "sqlite3" only. cache mode setting used for connecting to the database. (private, shared)
+    ;cache_mode = private
+
+    #################################### Cache server #############################
+    [remote_cache]
+    # Either "redis", "memcached" or "database" default is "database"
+    ;type = database
+
+    # cache connectionstring options
+    # database: will use Grafana primary database.
+    # redis: config like redis server e.g. `addr=127.0.0.1:6379,pool_size=100,db=grafana`
+    # memcache: 127.0.0.1:11211
+    ;connstr =
+
+    #################################### Session ####################################
+    [session]
+    # Either "memory", "file", "redis", "mysql", "postgres", default is "file"
+    ;provider = file
+
+    # Provider config options
+    # memory: not have any config yet
+    # file: session dir path, is relative to grafana data_path
+    # redis: config like redis server e.g. `addr=127.0.0.1:6379,pool_size=100,db=grafana`
+    # mysql: go-sql-driver/mysql dsn config string, e.g. `user:password@tcp(127.0.0.1:3306)/database_name`
+    # postgres: user=a password=b host=localhost port=5432 dbname=c sslmode=disable
+    ;provider_config = sessions
+
+    # Session cookie name
+    ;cookie_name = grafana_sess
+
+    # If you use session in https only, default is false
+    ;cookie_secure = false
+
+    # Session life time, default is 86400
+    ;session_life_time = 86400
+
+    #################################### Data proxy ###########################
+    [dataproxy]
+
+    # This enables data proxy logging, default is false
+    ;logging = false
+
+    # How long the data proxy should wait before timing out default is 30 (seconds)
+    ;timeout = 30
+
+    # If enabled and user is not anonymous, data proxy will add X-Grafana-User header with username into the request, default is false.
+    ;send_user_header = false
+
+    #################################### Analytics ####################################
+    [analytics]
+    # Server reporting, sends usage counters to stats.grafana.org every 24 hours.
+    # No ip addresses are being tracked, only simple counters to track
+    # running instances, dashboard and error counts. It is very helpful to us.
+    # Change this option to false to disable reporting.
+    ;reporting_enabled = true
+
+    # Set to false to disable all checks to https://grafana.net
+    # for new vesions (grafana itself and plugins), check is used
+    # in some UI views to notify that grafana or plugin update exists
+    # This option does not cause any auto updates, nor send any information
+    # only a GET request to http://grafana.com to get latest versions
+    ;check_for_updates = true
+
+    # Google Analytics universal tracking code, only enabled if you specify an id here
+    ;google_analytics_ua_id =
+
+    # Google Tag Manager ID, only enabled if you specify an id here
+    ;google_tag_manager_id =
+
+    #################################### Security ####################################
+    [security]
+    # default admin user, created on startup
+    ;admin_user = admin
+
+    # default admin password, can be changed before first start of grafana,  or in profile settings
+    ;admin_password = admin
+
+    # used for signing
+    ;secret_key = SW2YcwTIb9zpOOhoPsMm
+
+    # disable gravatar profile images
+    ;disable_gravatar = false
+
+    # data source proxy whitelist (ip_or_domain:port separated by spaces)
+    ;data_source_proxy_whitelist =
+
+    # disable protection against brute force login attempts
+    ;disable_brute_force_login_protection = false
+
+    # set to true if you host Grafana behind HTTPS. default is false.
+    ;cookie_secure = false
+
+    # set cookie SameSite attribute. defaults to `lax`. can be set to "lax", "strict" and "none"
+    ;cookie_samesite = lax
+
+    #################################### Snapshots ###########################
+    [snapshots]
+    # snapshot sharing options
+    ;external_enabled = true
+    ;external_snapshot_url = https://snapshots-origin.raintank.io
+    ;external_snapshot_name = Publish to snapshot.raintank.io
+
+    # remove expired snapshot
+    ;snapshot_remove_expired = true
+
+    #################################### Dashboards History ##################
+    [dashboards]
+    # Number dashboard versions to keep (per dashboard). Default: 20, Minimum: 1
+    ;versions_to_keep = 20
+
+    #################################### Users ###############################
+    [users]
+    # disable user signup / registration
+    ;allow_sign_up = true
+
+    # Allow non admin users to create organizations
+    ;allow_org_create = true
+
+    # Set to true to automatically assign new users to the default organization (id 1)
+    ;auto_assign_org = true
+
+    # Default role new users will be automatically assigned (if disabled above is set to true)
+    ;auto_assign_org_role = Viewer
+
+    # Background text for the user field on the login page
+    ;login_hint = email or username
+    ;password_hint = password
+
+    # Default UI theme ("dark" or "light")
+    ;default_theme = dark
+
+    # External user management, these options affect the organization users view
+    ;external_manage_link_url =
+    ;external_manage_link_name =
+    ;external_manage_info =
+
+    # Viewers can edit/inspect dashboard settings in the browser. But not save the dashboard.
+    ;viewers_can_edit = false
+
+    # Editors can administrate dashboard, folders and teams they create
+    ;editors_can_admin = false
+
+    [auth]
+    # Login cookie name
+    ;login_cookie_name = grafana_session
+
+    # The lifetime (days) an authenticated user can be inactive before being required to login at next visit. Default is 7 days,
+    ;login_maximum_inactive_lifetime_days = 7
+
+    # The maximum lifetime (days) an authenticated user can be logged in since login time before being required to login. Default is 30 days.
+    ;login_maximum_lifetime_days = 30
+
+    # How often should auth tokens be rotated for authenticated users when being active. The default is each 10 minutes.
+    ;token_rotation_interval_minutes = 10
+
+    # Set to true to disable (hide) the login form, useful if you use OAuth, defaults to false
+    ;disable_login_form = false
+
+    # Set to true to disable the signout link in the side menu. useful if you use auth.proxy, defaults to false
+    ;disable_signout_menu = false
+
+    # URL to redirect the user to after sign out
+    ;signout_redirect_url =
+
+    # Set to true to attempt login with OAuth automatically, skipping the login screen.
+    # This setting is ignored if multiple OAuth providers are configured.
+    ;oauth_auto_login = false
+
+    #################################### Anonymous Auth ######################
+    [auth.anonymous]
+    # enable anonymous access
+    enabled = true
+
+    # specify organization name that should be used for unauthenticated users
+    ;org_name = Main Org.
+
+    # specify role for unauthenticated users
+    ;org_role = Viewer
+
+    #################################### Github Auth ##########################
+    [auth.github]
+    ;enabled = false
+    ;allow_sign_up = true
+    ;client_id = some_id
+    ;client_secret = some_secret
+    ;scopes = user:email,read:org
+    ;auth_url = https://github.com/login/oauth/authorize
+    ;token_url = https://github.com/login/oauth/access_token
+    ;api_url = https://api.github.com/user
+    ;team_ids =
+    ;allowed_organizations =
+
+    #################################### Google Auth ##########################
+    [auth.google]
+    ;enabled = false
+    ;allow_sign_up = true
+    ;client_id = some_client_id
+    ;client_secret = some_client_secret
+    ;scopes = https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email
+    ;auth_url = https://accounts.google.com/o/oauth2/auth
+    ;token_url = https://accounts.google.com/o/oauth2/token
+    ;api_url = https://www.googleapis.com/oauth2/v1/userinfo
+    ;allowed_domains =
+
+    #################################### Generic OAuth ##########################
+    [auth.generic_oauth]
+    ;enabled = false
+    ;name = OAuth
+    ;allow_sign_up = true
+    ;client_id = some_id
+    ;client_secret = some_secret
+    ;scopes = user:email,read:org
+    ;auth_url = https://foo.bar/login/oauth/authorize
+    ;token_url = https://foo.bar/login/oauth/access_token
+    ;api_url = https://foo.bar/user
+    ;team_ids =
+    ;allowed_organizations =
+    ;tls_skip_verify_insecure = false
+    ;tls_client_cert =
+    ;tls_client_key =
+    ;tls_client_ca =
+
+    ; Set to true to enable sending client_id and client_secret via POST body instead of Basic authentication HTTP header
+    ; This might be required if the OAuth provider is not RFC6749 compliant, only supporting credentials passed via POST payload
+    ;send_client_credentials_via_post = false
+
+    #################################### Grafana.com Auth ####################
+    [auth.grafana_com]
+    ;enabled = false
+    ;allow_sign_up = true
+    ;client_id = some_id
+    ;client_secret = some_secret
+    ;scopes = user:email
+    ;allowed_organizations =
+
+    #################################### Auth Proxy ##########################
+    [auth.proxy]
+    ;enabled = false
+    ;header_name = X-WEBAUTH-USER
+    ;header_property = username
+    ;auto_sign_up = true
+    ;ldap_sync_ttl = 60
+    ;whitelist = 192.168.1.1, 192.168.2.1
+    ;headers = Email:X-User-Email, Name:X-User-Name
+
+    #################################### Basic Auth ##########################
+    [auth.basic]
+    ;enabled = true
+
+    #################################### Auth LDAP ##########################
+    [auth.ldap]
+    ;enabled = false
+    ;config_file = /etc/grafana/ldap.toml
+    ;allow_sign_up = true
+
+    #################################### SMTP / Emailing ##########################
+    [smtp]
+    ;enabled = false
+    ;host = localhost:25
+    ;user =
+    # If the password contains # or ; you have to wrap it with trippel quotes. Ex """#password;"""
+    ;password =
+    ;cert_file =
+    ;key_file =
+    ;skip_verify = false
+    ;from_address = admin@grafana.localhost
+    ;from_name = Grafana
+    # EHLO identity in SMTP dialog (defaults to instance_name)
+    ;ehlo_identity = dashboard.example.com
+
+    [emails]
+    ;welcome_email_on_sign_up = false
+
+    #################################### Logging ##########################
+    [log]
+    # Either "console", "file", "syslog". Default is console and  file
+    # Use space to separate multiple modes, e.g. "console file"
+    ;mode = console file
+
+    # Either "debug", "info", "warn", "error", "critical", default is "info"
+    ;level = info
+
+    # optional settings to set different levels for specific loggers. Ex filters = sqlstore:debug
+    ;filters =
+
+    # For "console" mode only
+    [log.console]
+    ;level =
+
+    # log line format, valid options are text, console and json
+    ;format = console
+
+    # For "file" mode only
+    [log.file]
+    ;level =
+
+    # log line format, valid options are text, console and json
+    ;format = text
+
+    # This enables automated log rotate(switch of following options), default is true
+    ;log_rotate = true
+
+    # Max line number of single file, default is 1000000
+    ;max_lines = 1000000
+
+    # Max size shift of single file, default is 28 means 1 << 28, 256MB
+    ;max_size_shift = 28
+
+    # Segment log daily, default is true
+    ;daily_rotate = true
+
+    # Expired days of log file(delete after max days), default is 7
+    ;max_days = 7
+
+    [log.syslog]
+    ;level =
+
+    # log line format, valid options are text, console and json
+    ;format = text
+
+    # Syslog network type and address. This can be udp, tcp, or unix. If left blank, the default unix endpoints will be used.
+    ;network =
+    ;address =
+
+    # Syslog facility. user, daemon and local0 through local7 are valid.
+    ;facility =
+
+    # Syslog tag. By default, the process' argv[0] is used.
+    ;tag =
+
+    #################################### Alerting ############################
+    [alerting]
+    # Disable alerting engine & UI features
+    ;enabled = true
+    # Makes it possible to turn off alert rule execution but alerting UI is visible
+    ;execute_alerts = true
+
+    # Default setting for new alert rules. Defaults to categorize error and timeouts as alerting. (alerting, keep_state)
+    ;error_or_timeout = alerting
+
+    # Default setting for how Grafana handles nodata or null values in alerting. (alerting, no_data, keep_state, ok)
+    ;nodata_or_nullvalues = no_data
+
+    # Alert notifications can include images, but rendering many images at the same time can overload the server
+    # This limit will protect the server from render overloading and make sure notifications are sent out quickly
+    ;concurrent_render_limit = 5
+
+    #################################### Explore #############################
+    [explore]
+    # Enable the Explore section
+    ;enabled = true
+
+    #################################### Internal Grafana Metrics ##########################
+    # Metrics available at HTTP API Url /metrics
+    [metrics]
+    # Disable / Enable internal metrics
+    ;enabled           = true
+
+    # Publish interval
+    ;interval_seconds  = 10
+
+    # Send internal metrics to Graphite
+    [metrics.graphite]
+    # Enable by setting the address setting (ex localhost:2003)
+    ;address =
+    ;prefix = prod.grafana.%(instance_name)s.
+
+    #################################### Distributed tracing ############
+    [tracing.jaeger]
+    # Enable by setting the address sending traces to jaeger (ex localhost:6831)
+    ;address = localhost:6831
+    # Tag that will always be included in when creating new spans. ex (tag1:value1,tag2:value2)
+    ;always_included_tag = tag1:value1
+    # Type specifies the type of the sampler: const, probabilistic, rateLimiting, or remote
+    ;sampler_type = const
+    # jaeger samplerconfig param
+    # for "const" sampler, 0 or 1 for always false/true respectively
+    # for "probabilistic" sampler, a probability between 0 and 1
+    # for "rateLimiting" sampler, the number of spans per second
+    # for "remote" sampler, param is the same as for "probabilistic"
+    # and indicates the initial sampling rate before the actual one
+    # is received from the mothership
+    ;sampler_param = 1
+
+    #################################### Grafana.com integration  ##########################
+    # Url used to import dashboards directly from Grafana.com
+    [grafana_com]
+    ;url = https://grafana.com
+
+    #################################### External image storage ##########################
+    [external_image_storage]
+    # Used for uploading images to public servers so they can be included in slack/email messages.
+    # you can choose between (s3, webdav, gcs, azure_blob, local)
+    ;provider =
+
+    [external_image_storage.s3]
+    ;bucket =
+    ;region =
+    ;path =
+    ;access_key =
+    ;secret_key =
+
+    [external_image_storage.webdav]
+    ;url =
+    ;public_url =
+    ;username =
+    ;password =
+
+    [external_image_storage.gcs]
+    ;key_file =
+    ;bucket =
+    ;path =
+
+    [external_image_storage.azure_blob]
+    ;account_name =
+    ;account_key =
+    ;container_name =
+
+    [external_image_storage.local]
+    # does not require any configuration
+
+    [rendering]
+    # Options to configure external image rendering server like https://github.com/grafana/grafana-image-renderer
+    ;server_url =
+    ;callback_url =
+
+    [enterprise]
+    # Path to a valid Grafana Enterprise license.jwt file
+    ;license_path =
+
+    [panels]
+    ;enable_alpha = false
+    # If set to true Grafana will allow script tags in text panels. Not recommended as it enable XSS vulnerabilities.
+    ;disable_sanitize_html = false
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-namespace-quotas
+  namespace: monitoring
+data:
+  cluster-compute-resources.json: |-
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": "-- Grafana --",
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "gnetId": null,
+      "graphTooltip": 0,
+      "id": 4,
+      "links": [],
+      "panels": [
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "Prometheus",
+          "fill": 1,
+          "gridPos": {
+            "h": 9,
+            "w": 12,
+            "x": 0,
+            "y": 0
+          },
+          "id": 2,
+          "legend": {
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 2,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "expr": "sum(kube_pod_container_resource_requests_cpu_cores) by (namespace)",
+              "format": "time_series",
+              "hide": false,
+              "intervalFactor": 1,
+              "refId": "A"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeRegions": [],
+          "timeShift": null,
+          "title": "CPU Requests by Namespace",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": null
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "Prometheus",
+          "fill": 1,
+          "gridPos": {
+            "h": 9,
+            "w": 12,
+            "x": 12,
+            "y": 0
+          },
+          "id": 3,
+          "legend": {
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 2,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "expr": "sum(rate(container_cpu_usage_seconds_total{container_name!=\"POD\",namespace!=\"\"}[1m])) by (namespace)",
+              "format": "time_series",
+              "hide": false,
+              "intervalFactor": 1,
+              "refId": "A"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeRegions": [],
+          "timeShift": null,
+          "title": "CPU Usages by Namespace",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": null
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "Prometheus",
+          "fill": 1,
+          "gridPos": {
+            "h": 9,
+            "w": 12,
+            "x": 0,
+            "y": 9
+          },
+          "id": 4,
+          "legend": {
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 2,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "expr": "sum(container_memory_working_set_bytes{container_name!=\"POD\",container_name!=\"\"}) by (namespace)",
+              "format": "time_series",
+              "hide": false,
+              "intervalFactor": 1,
+              "refId": "A"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeRegions": [],
+          "timeShift": null,
+          "title": "Memory Usages by Namespace",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "decbytes",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": null
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "Prometheus",
+          "fill": 1,
+          "gridPos": {
+            "h": 9,
+            "w": 12,
+            "x": 12,
+            "y": 9
+          },
+          "id": 5,
+          "legend": {
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 2,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "expr": "sum(kube_pod_container_resource_requests_memory_bytes) by (namespace)",
+              "format": "time_series",
+              "hide": false,
+              "intervalFactor": 1,
+              "refId": "A"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeRegions": [],
+          "timeShift": null,
+          "title": "Memory Requests by Namespace",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "decbytes",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": null
+          }
+        }
+      ],
+      "schemaVersion": 18,
+      "style": "dark",
+      "tags": [],
+      "templating": {
+        "list": []
+      },
+      "time": {
+        "from": "now-6h",
+        "to": "now"
+      },
+      "timepicker": {
+        "refresh_intervals": [
+          "5s",
+          "10s",
+          "30s",
+          "1m",
+          "5m",
+          "15m",
+          "30m",
+          "1h",
+          "2h",
+          "1d"
+        ],
+        "time_options": [
+          "5m",
+          "15m",
+          "1h",
+          "6h",
+          "12h",
+          "24h",
+          "2d",
+          "7d",
+          "30d"
+        ]
+      },
+      "timezone": "",
+      "title": "Namespace Resource Usage & Quotas",
+      "uid": "TFxq8hoWk",
+      "version": 5
+    }
+
+---
+
+# Source: grafana/templates/grafana-dashboard.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards
+  namespace: monitoring
+data:
+  dashboards.yaml: |-
+    {
+        "apiVersion": 1,
+        "providers": [
+            {
+                "folder": "",
+                "name": "0",
+                "options": {
+                    "path": "/grafana-dashboard-definitions/0"
+                },
+                "orgId": 1,
+                "type": "file"
+            }
+        ]
+    }
+
+---
+# Source: grafana/templates/secret-cluster-compute-resources.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-cluster
+  namespace: monitoring
+data:
+  cluster-compute-resources.json: |
+    {
+    "annotations": {
+      "list": [
+        {
+          "builtIn": 1,
+          "datasource": "-- Grafana --",
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "type": "dashboard"
+        }
+      ]
+    },
+    "description": "Monitors Kubernetes cluster using Prometheus. Shows overall cluster CPU / Memory / Filesystem usage as well as individual pod, containers, systemd services statistics. Uses cAdvisor metrics only.",
+    "editable": true,
+    "gnetId": 315,
+    "graphTooltip": 0,
+    "id": 1,
+    "iteration": 1556740355351,
+    "links": [],
+    "panels": [
+      {
+        "collapsed": false,
+        "gridPos": {
+          "h": 1,
+          "w": 24,
+          "x": 0,
+          "y": 0
+        },
+        "id": 6,
+        "panels": [],
+        "title": "Node Wide Resource Usages",
+        "type": "row"
+      },
+      {
+        "cacheTimeout": null,
+        "colorBackground": false,
+        "colorValue": true,
+        "colors": [
+          "#299c46",
+          "rgba(237, 129, 40, 0.89)",
+          "#d44a3a"
+        ],
+        "datasource": "Prometheus",
+        "decimals": 1,
+        "format": "percent",
+        "gauge": {
+          "maxValue": 100,
+          "minValue": 0,
+          "show": true,
+          "thresholdLabels": false,
+          "thresholdMarkers": true
+        },
+        "gridPos": {
+          "h": 5,
+          "w": 8,
+          "x": 0,
+          "y": 1
+        },
+        "id": 2,
+        "interval": null,
+        "links": [],
+        "mappingType": 1,
+        "mappingTypes": [
+          {
+            "name": "value to text",
+            "value": 1
+          },
+          {
+            "name": "range to text",
+            "value": 2
+          }
+        ],
+        "maxDataPoints": 100,
+        "nullPointMode": "connected",
+        "nullText": null,
+        "pluginVersion": "6.1.6",
+        "postfix": "",
+        "postfixFontSize": "50%",
+        "prefix": "",
+        "prefixFontSize": "50%",
+        "rangeMaps": [
+          {
+            "from": "null",
+            "text": "N/A",
+            "to": "null"
+          }
+        ],
+        "sparkline": {
+          "fillColor": "rgba(31, 118, 189, 0.18)",
+          "full": false,
+          "lineColor": "rgb(31, 120, 193)",
+          "show": false
+        },
+        "tableColumn": "",
+        "targets": [
+          {
+            "expr": "sum (container_memory_working_set_bytes{id=\"/\",kubernetes_io_hostname=~\"^$Node$\",container_name!=\"POD\"}) / sum (machine_memory_bytes{kubernetes_io_hostname=~\"^$Node$\"}) * 100",
+            "format": "time_series",
+            "hide": false,
+            "interval": "10s",
+            "intervalFactor": 1,
+            "refId": "A"
+          }
+        ],
+        "thresholds": "70,90",
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "Memory Usage",
+        "type": "singlestat",
+        "valueFontSize": "80%",
+        "valueMaps": [
+          {
+            "op": "=",
+            "text": "N/A",
+            "value": "null"
+          }
+        ],
+        "valueName": "current"
+      },
+      {
+        "cacheTimeout": null,
+        "colorBackground": false,
+        "colorValue": true,
+        "colors": [
+          "#299c46",
+          "rgba(237, 129, 40, 0.89)",
+          "#d44a3a"
+        ],
+        "datasource": "Prometheus",
+        "decimals": 1,
+        "format": "percent",
+        "gauge": {
+          "maxValue": 100,
+          "minValue": 0,
+          "show": true,
+          "thresholdLabels": false,
+          "thresholdMarkers": true
+        },
+        "gridPos": {
+          "h": 5,
+          "w": 8,
+          "x": 8,
+          "y": 1
+        },
+        "id": 3,
+        "interval": null,
+        "links": [],
+        "mappingType": 1,
+        "mappingTypes": [
+          {
+            "name": "value to text",
+            "value": 1
+          },
+          {
+            "name": "range to text",
+            "value": 2
+          }
+        ],
+        "maxDataPoints": 100,
+        "nullPointMode": "connected",
+        "nullText": null,
+        "pluginVersion": "6.1.6",
+        "postfix": "",
+        "postfixFontSize": "50%",
+        "prefix": "",
+        "prefixFontSize": "50%",
+        "rangeMaps": [
+          {
+            "from": "null",
+            "text": "N/A",
+            "to": "null"
+          }
+        ],
+        "sparkline": {
+          "fillColor": "rgba(31, 118, 189, 0.18)",
+          "full": false,
+          "lineColor": "rgb(31, 120, 193)",
+          "show": false
+        },
+        "tableColumn": "",
+        "targets": [
+          {
+            "expr": "sum (rate (container_cpu_usage_seconds_total{id=\"/\",kubernetes_io_hostname=~\"^$Node$\",container_name!=\"POD\"}[1m])) / sum (machine_cpu_cores{kubernetes_io_hostname=~\"^$Node$\"}) * 100",
+            "format": "time_series",
+            "hide": false,
+            "interval": "10s",
+            "intervalFactor": 1,
+            "refId": "A"
+          }
+        ],
+        "thresholds": "70,90",
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "CPU Usage",
+        "type": "singlestat",
+        "valueFontSize": "80%",
+        "valueMaps": [
+          {
+            "op": "=",
+            "text": "N/A",
+            "value": "null"
+          }
+        ],
+        "valueName": "current"
+      },
+      {
+        "cacheTimeout": null,
+        "colorBackground": false,
+        "colorValue": true,
+        "colors": [
+          "#299c46",
+          "rgba(237, 129, 40, 0.89)",
+          "#d44a3a"
+        ],
+        "datasource": "Prometheus",
+        "decimals": 1,
+        "format": "percent",
+        "gauge": {
+          "maxValue": 100,
+          "minValue": 0,
+          "show": true,
+          "thresholdLabels": false,
+          "thresholdMarkers": true
+        },
+        "gridPos": {
+          "h": 5,
+          "w": 8,
+          "x": 16,
+          "y": 1
+        },
+        "id": 4,
+        "interval": null,
+        "links": [],
+        "mappingType": 1,
+        "mappingTypes": [
+          {
+            "name": "value to text",
+            "value": 1
+          },
+          {
+            "name": "range to text",
+            "value": 2
+          }
+        ],
+        "maxDataPoints": 100,
+        "nullPointMode": "connected",
+        "nullText": null,
+        "pluginVersion": "6.1.6",
+        "postfix": "",
+        "postfixFontSize": "50%",
+        "prefix": "",
+        "prefixFontSize": "50%",
+        "rangeMaps": [
+          {
+            "from": "null",
+            "text": "N/A",
+            "to": "null"
+          }
+        ],
+        "sparkline": {
+          "fillColor": "rgba(31, 118, 189, 0.18)",
+          "full": false,
+          "lineColor": "rgb(31, 120, 193)",
+          "show": false
+        },
+        "tableColumn": "",
+        "targets": [
+          {
+            "expr": "sum (container_fs_usage_bytes{device=~\"^/dev/[sv]d[a-z][1-9]$\",id=\"/\",kubernetes_io_hostname=~\"^$Node$\",container_name!=\"POD\"}) / sum (container_fs_limit_bytes{container_name!=\"POD\",device=~\"^/dev/[sv]d[a-z][1-9]$\",id=\"/\",kubernetes_io_hostname=~\"^$Node$\"}) * 100",
+            "format": "time_series",
+            "hide": false,
+            "interval": "10s",
+            "intervalFactor": 1,
+            "refId": "A"
+          }
+        ],
+        "thresholds": "70,90",
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "Disk Usage",
+        "type": "singlestat",
+        "valueFontSize": "80%",
+        "valueMaps": [
+          {
+            "op": "=",
+            "text": "N/A",
+            "value": "null"
+          }
+        ],
+        "valueName": "current"
+      },
+      {
+        "cacheTimeout": null,
+        "colorBackground": false,
+        "colorValue": false,
+        "colors": [
+          "rgba(50, 172, 45, 0.97)",
+          "rgba(237, 129, 40, 0.89)",
+          "rgba(245, 54, 54, 0.9)"
+        ],
+        "datasource": "Prometheus",
+        "decimals": 2,
+        "editable": true,
+        "error": false,
+        "format": "bytes",
+        "gauge": {
+          "maxValue": 100,
+          "minValue": 0,
+          "show": false,
+          "thresholdLabels": false,
+          "thresholdMarkers": true
+        },
+        "gridPos": {
+          "h": 3,
+          "w": 4,
+          "x": 0,
+          "y": 6
+        },
+        "height": "1px",
+        "id": 8,
+        "interval": null,
+        "links": [],
+        "mappingType": 1,
+        "mappingTypes": [
+          {
+            "name": "value to text",
+            "value": 1
+          },
+          {
+            "name": "range to text",
+            "value": 2
+          }
+        ],
+        "maxDataPoints": 100,
+        "nullPointMode": "connected",
+        "nullText": null,
+        "postfix": "",
+        "postfixFontSize": "20%",
+        "prefix": "",
+        "prefixFontSize": "20%",
+        "rangeMaps": [
+          {
+            "from": "null",
+            "text": "N/A",
+            "to": "null"
+          }
+        ],
+        "sparkline": {
+          "fillColor": "rgba(31, 118, 189, 0.18)",
+          "full": false,
+          "lineColor": "rgb(31, 120, 193)",
+          "show": false
+        },
+        "tableColumn": "",
+        "targets": [
+          {
+            "expr": "sum (container_memory_working_set_bytes{id=\"/\",kubernetes_io_hostname=~\"^$Node$\",container_name!=\"POD\"})",
+            "format": "time_series",
+            "interval": "10s",
+            "intervalFactor": 1,
+            "refId": "A",
+            "step": 30
+          }
+        ],
+        "thresholds": "",
+        "title": "Used",
+        "type": "singlestat",
+        "valueFontSize": "50%",
+        "valueMaps": [
+          {
+            "op": "=",
+            "text": "N/A",
+            "value": "null"
+          }
+        ],
+        "valueName": "current"
+      },
+      {
+        "cacheTimeout": null,
+        "colorBackground": false,
+        "colorValue": false,
+        "colors": [
+          "rgba(50, 172, 45, 0.97)",
+          "rgba(237, 129, 40, 0.89)",
+          "rgba(245, 54, 54, 0.9)"
+        ],
+        "datasource": "Prometheus",
+        "decimals": 2,
+        "editable": true,
+        "error": false,
+        "format": "bytes",
+        "gauge": {
+          "maxValue": 100,
+          "minValue": 0,
+          "show": false,
+          "thresholdLabels": false,
+          "thresholdMarkers": true
+        },
+        "gridPos": {
+          "h": 3,
+          "w": 4,
+          "x": 4,
+          "y": 6
+        },
+        "height": "1px",
+        "id": 9,
+        "interval": null,
+        "links": [],
+        "mappingType": 1,
+        "mappingTypes": [
+          {
+            "name": "value to text",
+            "value": 1
+          },
+          {
+            "name": "range to text",
+            "value": 2
+          }
+        ],
+        "maxDataPoints": 100,
+        "nullPointMode": "connected",
+        "nullText": null,
+        "postfix": "",
+        "postfixFontSize": "50%",
+        "prefix": "",
+        "prefixFontSize": "50%",
+        "rangeMaps": [
+          {
+            "from": "null",
+            "text": "N/A",
+            "to": "null"
+          }
+        ],
+        "sparkline": {
+          "fillColor": "rgba(31, 118, 189, 0.18)",
+          "full": false,
+          "lineColor": "rgb(31, 120, 193)",
+          "show": false
+        },
+        "tableColumn": "",
+        "targets": [
+          {
+            "expr": "sum (machine_memory_bytes{kubernetes_io_hostname=~\"^$Node$\"})",
+            "format": "time_series",
+            "interval": "10s",
+            "intervalFactor": 1,
+            "refId": "A",
+            "step": 30
+          }
+        ],
+        "thresholds": "",
+        "title": "Total",
+        "type": "singlestat",
+        "valueFontSize": "50%",
+        "valueMaps": [
+          {
+            "op": "=",
+            "text": "N/A",
+            "value": "null"
+          }
+        ],
+        "valueName": "current"
+      },
+      {
+        "cacheTimeout": null,
+        "colorBackground": false,
+        "colorValue": false,
+        "colors": [
+          "rgba(50, 172, 45, 0.97)",
+          "rgba(237, 129, 40, 0.89)",
+          "rgba(245, 54, 54, 0.9)"
+        ],
+        "datasource": "Prometheus",
+        "decimals": 2,
+        "editable": true,
+        "error": false,
+        "format": "none",
+        "gauge": {
+          "maxValue": 100,
+          "minValue": 0,
+          "show": false,
+          "thresholdLabels": false,
+          "thresholdMarkers": true
+        },
+        "gridPos": {
+          "h": 3,
+          "w": 4,
+          "x": 8,
+          "y": 6
+        },
+        "height": "1px",
+        "id": 10,
+        "interval": null,
+        "links": [],
+        "mappingType": 1,
+        "mappingTypes": [
+          {
+            "name": "value to text",
+            "value": 1
+          },
+          {
+            "name": "range to text",
+            "value": 2
+          }
+        ],
+        "maxDataPoints": 100,
+        "nullPointMode": "connected",
+        "nullText": null,
+        "postfix": " cores",
+        "postfixFontSize": "30%",
+        "prefix": "",
+        "prefixFontSize": "50%",
+        "rangeMaps": [
+          {
+            "from": "null",
+            "text": "N/A",
+            "to": "null"
+          }
+        ],
+        "sparkline": {
+          "fillColor": "rgba(31, 118, 189, 0.18)",
+          "full": false,
+          "lineColor": "rgb(31, 120, 193)",
+          "show": false
+        },
+        "tableColumn": "",
+        "targets": [
+          {
+            "expr": "sum (rate (container_cpu_usage_seconds_total{id=\"/\",kubernetes_io_hostname=~\"^$Node$\",container_name!=\"POD\"}[1m]))",
+            "format": "time_series",
+            "interval": "10s",
+            "intervalFactor": 1,
+            "refId": "A",
+            "step": 30
+          }
+        ],
+        "thresholds": "",
+        "title": "Used",
+        "type": "singlestat",
+        "valueFontSize": "50%",
+        "valueMaps": [
+          {
+            "op": "=",
+            "text": "N/A",
+            "value": "null"
+          }
+        ],
+        "valueName": "current"
+      },
+      {
+        "cacheTimeout": null,
+        "colorBackground": false,
+        "colorValue": false,
+        "colors": [
+          "rgba(50, 172, 45, 0.97)",
+          "rgba(237, 129, 40, 0.89)",
+          "rgba(245, 54, 54, 0.9)"
+        ],
+        "datasource": "Prometheus",
+        "decimals": 2,
+        "editable": true,
+        "error": false,
+        "format": "none",
+        "gauge": {
+          "maxValue": 100,
+          "minValue": 0,
+          "show": false,
+          "thresholdLabels": false,
+          "thresholdMarkers": true
+        },
+        "gridPos": {
+          "h": 3,
+          "w": 4,
+          "x": 12,
+          "y": 6
+        },
+        "height": "1px",
+        "id": 11,
+        "interval": null,
+        "links": [],
+        "mappingType": 1,
+        "mappingTypes": [
+          {
+            "name": "value to text",
+            "value": 1
+          },
+          {
+            "name": "range to text",
+            "value": 2
+          }
+        ],
+        "maxDataPoints": 100,
+        "nullPointMode": "connected",
+        "nullText": null,
+        "postfix": " cores",
+        "postfixFontSize": "30%",
+        "prefix": "",
+        "prefixFontSize": "50%",
+        "rangeMaps": [
+          {
+            "from": "null",
+            "text": "N/A",
+            "to": "null"
+          }
+        ],
+        "sparkline": {
+          "fillColor": "rgba(31, 118, 189, 0.18)",
+          "full": false,
+          "lineColor": "rgb(31, 120, 193)",
+          "show": false
+        },
+        "tableColumn": "",
+        "targets": [
+          {
+            "expr": "sum (machine_cpu_cores{kubernetes_io_hostname=~\"^$Node$\"})",
+            "interval": "10s",
+            "intervalFactor": 1,
+            "refId": "A",
+            "step": 30
+          }
+        ],
+        "thresholds": "",
+        "title": "Total",
+        "type": "singlestat",
+        "valueFontSize": "50%",
+        "valueMaps": [
+          {
+            "op": "=",
+            "text": "N/A",
+            "value": "null"
+          }
+        ],
+        "valueName": "current"
+      },
+      {
+        "cacheTimeout": null,
+        "colorBackground": false,
+        "colorValue": false,
+        "colors": [
+          "rgba(50, 172, 45, 0.97)",
+          "rgba(237, 129, 40, 0.89)",
+          "rgba(245, 54, 54, 0.9)"
+        ],
+        "datasource": "Prometheus",
+        "decimals": 2,
+        "editable": true,
+        "error": false,
+        "format": "bytes",
+        "gauge": {
+          "maxValue": 100,
+          "minValue": 0,
+          "show": false,
+          "thresholdLabels": false,
+          "thresholdMarkers": true
+        },
+        "gridPos": {
+          "h": 3,
+          "w": 4,
+          "x": 16,
+          "y": 6
+        },
+        "height": "1px",
+        "id": 12,
+        "interval": null,
+        "links": [],
+        "mappingType": 1,
+        "mappingTypes": [
+          {
+            "name": "value to text",
+            "value": 1
+          },
+          {
+            "name": "range to text",
+            "value": 2
+          }
+        ],
+        "maxDataPoints": 100,
+        "nullPointMode": "connected",
+        "nullText": null,
+        "postfix": "",
+        "postfixFontSize": "50%",
+        "prefix": "",
+        "prefixFontSize": "50%",
+        "rangeMaps": [
+          {
+            "from": "null",
+            "text": "N/A",
+            "to": "null"
+          }
+        ],
+        "sparkline": {
+          "fillColor": "rgba(31, 118, 189, 0.18)",
+          "full": false,
+          "lineColor": "rgb(31, 120, 193)",
+          "show": false
+        },
+        "tableColumn": "",
+        "targets": [
+          {
+            "expr": "sum (container_fs_usage_bytes{device=~\"^/dev/[sv]d[a-z][1-9]$\",id=\"/\",kubernetes_io_hostname=~\"^$Node$\",container_name!=\"POD\"})",
+            "format": "time_series",
+            "interval": "10s",
+            "intervalFactor": 1,
+            "refId": "A",
+            "step": 30
+          }
+        ],
+        "thresholds": "",
+        "title": "Used",
+        "type": "singlestat",
+        "valueFontSize": "50%",
+        "valueMaps": [
+          {
+            "op": "=",
+            "text": "N/A",
+            "value": "null"
+          }
+        ],
+        "valueName": "current"
+      },
+      {
+        "cacheTimeout": null,
+        "colorBackground": false,
+        "colorValue": false,
+        "colors": [
+          "rgba(50, 172, 45, 0.97)",
+          "rgba(237, 129, 40, 0.89)",
+          "rgba(245, 54, 54, 0.9)"
+        ],
+        "datasource": "Prometheus",
+        "decimals": 2,
+        "editable": true,
+        "error": false,
+        "format": "bytes",
+        "gauge": {
+          "maxValue": 100,
+          "minValue": 0,
+          "show": false,
+          "thresholdLabels": false,
+          "thresholdMarkers": true
+        },
+        "gridPos": {
+          "h": 3,
+          "w": 4,
+          "x": 20,
+          "y": 6
+        },
+        "height": "1px",
+        "id": 13,
+        "interval": null,
+        "links": [],
+        "mappingType": 1,
+        "mappingTypes": [
+          {
+            "name": "value to text",
+            "value": 1
+          },
+          {
+            "name": "range to text",
+            "value": 2
+          }
+        ],
+        "maxDataPoints": 100,
+        "nullPointMode": "connected",
+        "nullText": null,
+        "postfix": "",
+        "postfixFontSize": "50%",
+        "prefix": "",
+        "prefixFontSize": "50%",
+        "rangeMaps": [
+          {
+            "from": "null",
+            "text": "N/A",
+            "to": "null"
+          }
+        ],
+        "sparkline": {
+          "fillColor": "rgba(31, 118, 189, 0.18)",
+          "full": false,
+          "lineColor": "rgb(31, 120, 193)",
+          "show": false
+        },
+        "tableColumn": "",
+        "targets": [
+          {
+            "expr": "sum (container_fs_limit_bytes{device=~\"^/dev/[sv]d[a-z][1-9]$\",id=\"/\",kubernetes_io_hostname=~\"^$Node$\",container_name!=\"POD\"})",
+            "format": "time_series",
+            "interval": "10s",
+            "intervalFactor": 1,
+            "refId": "A",
+            "step": 30
+          }
+        ],
+        "thresholds": "",
+        "title": "Total",
+        "type": "singlestat",
+        "valueFontSize": "50%",
+        "valueMaps": [
+          {
+            "op": "=",
+            "text": "N/A",
+            "value": "null"
+          }
+        ],
+        "valueName": "current"
+      }
+    ],
+    "refresh": "5s",
+    "schemaVersion": 18,
+    "style": "dark",
+    "tags": [
+      "kubernetes"
+    ],
+    "templating": {
+      "list": [
+        {
+          "allValue": ".*",
+          "current": {
+            "text": "All",
+            "value": "$__all"
+          },
+          "datasource": "Prometheus",
+          "definition": "",
+          "hide": 0,
+          "includeAll": true,
+          "label": null,
+          "multi": false,
+          "name": "Node",
+          "options": [],
+          "query": "label_values(machine_memory_bytes{},kubernetes_io_hostname)",
+          "refresh": 1,
+          "regex": "",
+          "skipUrlSync": false,
+          "sort": 0,
+          "tagValuesQuery": "",
+          "tags": [],
+          "tagsQuery": "",
+          "type": "query",
+          "useTags": false
+        }
+      ]
+    },
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "timepicker": {
+      "refresh_intervals": [
+        "5s",
+        "10s",
+        "30s",
+        "1m",
+        "5m",
+        "15m",
+        "30m",
+        "1h",
+        "2h",
+        "1d"
+      ],
+      "time_options": [
+        "5m",
+        "15m",
+        "1h",
+        "6h",
+        "12h",
+        "24h",
+        "2d",
+        "7d",
+        "30d"
+      ]
+    },
+    "timezone": "browser",
+    "title": "Kubernetes Cluster Monitoring",
+    "uid": "8fpzp0mgtvsr52bk99cdbg5xxt6jnzd6",
+    "version": 2
+    }
+
+---
+# Source: grafana/templates/secret-namespace-compute-resources.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-namespace
+  namespace: monitoring
+data:
+  cluster-compute-resources.json: |
+        {
+        "annotations": {
+          "list": [
+            {
+              "builtIn": 1,
+              "datasource": "-- Grafana --",
+              "enable": true,
+              "hide": true,
+              "iconColor": "rgba(0, 211, 255, 1)",
+              "name": "Annotations & Alerts",
+              "type": "dashboard"
+            }
+          ]
+        },
+        "editable": true,
+        "gnetId": null,
+        "graphTooltip": 0,
+        "iteration": 1585549961263,
+        "links": [],
+        "panels": [
+          {
+            "gridPos": {
+              "h": 1,
+              "w": 24,
+              "x": 0,
+              "y": 0
+            },
+            "id": 15,
+            "title": "Namespace Based CPU and Ram Usages",
+            "type": "row"
+          },
+          {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": "Prometheus",
+            "decimals": 2,
+            "editable": true,
+            "error": false,
+            "fill": 0,
+            "grid": {},
+            "gridPos": {
+              "h": 8,
+              "w": 24,
+              "x": 0,
+              "y": 1
+            },
+            "id": 2,
+            "legend": {
+              "alignAsTable": true,
+              "avg": true,
+              "current": true,
+              "max": true,
+              "min": false,
+              "rightSide": false,
+              "show": true,
+              "sideWidth": 200,
+              "sort": "current",
+              "sortDesc": true,
+              "total": false,
+              "values": true
+            },
+            "lines": true,
+            "linewidth": 1,
+            "links": [],
+            "nullPointMode": "null as zero",
+            "percentage": false,
+            "pointradius": 5,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [
+              {
+                "expr": "sum (container_memory_working_set_bytes{image!=\"\",name=~\"^k8s_.*\",container_name!=\"POD\", namespace=~\"^$namespace$\", pod_name=~\"^$pod$\"}) by (pod_name)",
+                "format": "time_series",
+                "hide": false,
+                "interval": "10s",
+                "intervalFactor": 1,
+                "legendFormat": " {{ pod_name }} ",
+                "metric": "container_memory_usage:sort_desc",
+                "refId": "A",
+                "step": 10
+              }
+            ],
+            "thresholds": [],
+            "timeFrom": null,
+            "timeRegions": [],
+            "timeShift": null,
+            "title": "Memory Usage by Pod",
+            "tooltip": {
+              "msResolution": false,
+              "shared": true,
+              "sort": 1,
+              "value_type": "cumulative"
+            },
+            "type": "graph",
+            "xaxis": {
+              "buckets": null,
+              "mode": "time",
+              "name": null,
+              "show": true,
+              "values": []
+            },
+            "yaxes": [
+              {
+                "format": "decbytes",
+                "label": "",
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": true
+              },
+              {
+                "format": "short",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": false
+              }
+            ],
+            "yaxis": {
+              "align": false,
+              "alignLevel": 1
+            }
+          },
+          {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": "Prometheus",
+            "decimals": 2,
+            "editable": true,
+            "error": false,
+            "fill": 0,
+            "grid": {},
+            "gridPos": {
+              "h": 9,
+              "w": 24,
+              "x": 0,
+              "y": 9
+            },
+            "id": 3,
+            "legend": {
+              "alignAsTable": true,
+              "avg": false,
+              "current": true,
+              "hideEmpty": false,
+              "max": false,
+              "min": false,
+              "rightSide": false,
+              "show": true,
+              "sideWidth": 200,
+              "sort": "current",
+              "sortDesc": true,
+              "total": false,
+              "values": true
+            },
+            "lines": true,
+            "linewidth": 1,
+            "links": [],
+            "nullPointMode": "null as zero",
+            "percentage": false,
+            "pointradius": 5,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [
+              {
+                "expr": "sum (rate (container_cpu_usage_seconds_total{image!=\"\",name=~\"^k8s_.*\",namespace=~\"^$namespace$\",container_name!=\"POD\", pod_name=~\"^$pod$\"}[1m])) by (pod_name)",
+                "format": "time_series",
+                "hide": false,
+                "interval": "10s",
+                "intervalFactor": 1,
+                "legendFormat": " {{ pod_name }} ",
+                "metric": "container_memory_usage:sort_desc",
+                "refId": "A",
+                "step": 10
+              },
+              {
+                "expr": "sum (container_cpu_usage_seconds_total{image!=\"\",name=~\"^k8s_.*\",namespace=~\"^$namespace$\",container_name!=\"POD\", pod_name=~\"^$pod$\"}) by (pod_name)",
+                "format": "time_series",
+                "hide": true,
+                "intervalFactor": 1,
+                "legendFormat": " {{ pod_name }} ",
+                "refId": "B"
+              }
+            ],
+            "thresholds": [],
+            "timeFrom": null,
+            "timeRegions": [],
+            "timeShift": null,
+            "title": "CPU Usage by Pod",
+            "tooltip": {
+              "msResolution": false,
+              "shared": true,
+              "sort": 1,
+              "value_type": "cumulative"
+            },
+            "type": "graph",
+            "xaxis": {
+              "buckets": null,
+              "mode": "time",
+              "name": null,
+              "show": true,
+              "values": []
+            },
+            "yaxes": [
+              {
+                "format": "bytes",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": true
+              },
+              {
+                "format": "short",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": false
+              }
+            ],
+            "yaxis": {
+              "align": false,
+              "alignLevel": null
+            }
+          },
+          {
+            "gridPos": {
+              "h": 1,
+              "w": 24,
+              "x": 0,
+              "y": 18
+            },
+            "id": 13,
+            "panels": [],
+            "repeat": null,
+            "title": "Disk Usage by Pod",
+            "type": "row"
+          },
+          {
+            "cacheTimeout": null,
+            "colorBackground": false,
+            "colorValue": true,
+            "colors": [
+              "#299c46",
+              "rgba(237, 129, 40, 0.89)",
+              "#d44a3a"
+            ],
+            "datasource": "Prometheus",
+            "decimals": 3,
+            "format": "percent",
+            "gauge": {
+              "maxValue": 100,
+              "minValue": 0,
+              "show": true,
+              "thresholdLabels": false,
+              "thresholdMarkers": true
+            },
+            "gridPos": {
+              "h": 6,
+              "w": 24,
+              "x": 0,
+              "y": 19
+            },
+            "id": 5,
+            "interval": null,
+            "links": [],
+            "mappingType": 1,
+            "mappingTypes": [
+              {
+                "name": "value to text",
+                "value": 1
+              },
+              {
+                "name": "range to text",
+                "value": 2
+              }
+            ],
+            "maxDataPoints": 100,
+            "nullPointMode": "connected",
+            "nullText": null,
+            "pluginVersion": "6.1.6",
+            "postfix": "",
+            "postfixFontSize": "50%",
+            "prefix": "",
+            "prefixFontSize": "50%",
+            "rangeMaps": [
+              {
+                "from": "null",
+                "text": "N/A",
+                "to": "null"
+              }
+            ],
+            "sparkline": {
+              "fillColor": "rgba(31, 118, 189, 0.18)",
+              "full": false,
+              "lineColor": "rgb(31, 120, 193)",
+              "show": false
+            },
+            "tableColumn": "",
+            "targets": [
+              {
+                "expr": "sum (\n  container_fs_usage_bytes{device=~\"^/dev/[sv]d[a-z][1-9]$\",container_name!=\"POD\", namespace=~\"^$namespace$\", pod_name=~\"^$pod$\"}\n)\n/\nsum (\n  sum (kube_persistentvolumeclaim_resource_requests_storage_bytes{namespace=~\"^$namespace$\", persistentvolumeclaim=~\"^$volume$\"})\n) * 100",
+                "format": "time_series",
+                "hide": false,
+                "interval": "10s",
+                "intervalFactor": 1,
+                "refId": "A"
+              }
+            ],
+            "thresholds": "70,90",
+            "timeFrom": null,
+            "timeShift": null,
+            "title": "Persistent Volume Usage",
+            "type": "singlestat",
+            "valueFontSize": "50%",
+            "valueMaps": [
+              {
+                "op": "=",
+                "text": "N/A",
+                "value": "null"
+              }
+            ],
+            "valueName": "current"
+          },
+          {
+            "cacheTimeout": null,
+            "colorBackground": false,
+            "colorValue": false,
+            "colors": [
+              "rgba(50, 172, 45, 0.97)",
+              "rgba(237, 129, 40, 0.89)",
+              "rgba(245, 54, 54, 0.9)"
+            ],
+            "datasource": "Prometheus",
+            "decimals": 2,
+            "editable": true,
+            "error": false,
+            "format": "bytes",
+            "gauge": {
+              "maxValue": 100,
+              "minValue": 0,
+              "show": false,
+              "thresholdLabels": false,
+              "thresholdMarkers": true
+            },
+            "gridPos": {
+              "h": 5,
+              "w": 12,
+              "x": 0,
+              "y": 25
+            },
+            "height": "1px",
+            "id": 7,
+            "interval": null,
+            "links": [],
+            "mappingType": 1,
+            "mappingTypes": [
+              {
+                "name": "value to text",
+                "value": 1
+              },
+              {
+                "name": "range to text",
+                "value": 2
+              }
+            ],
+            "maxDataPoints": 100,
+            "nullPointMode": "connected",
+            "nullText": null,
+            "postfix": "",
+            "postfixFontSize": "50%",
+            "prefix": "",
+            "prefixFontSize": "50%",
+            "rangeMaps": [
+              {
+                "from": "null",
+                "text": "N/A",
+                "to": "null"
+              }
+            ],
+            "sparkline": {
+              "fillColor": "rgba(31, 118, 189, 0.18)",
+              "full": false,
+              "lineColor": "rgb(31, 120, 193)",
+              "show": false
+            },
+            "tableColumn": "",
+            "targets": [
+              {
+                "expr": "sum (\n  container_fs_usage_bytes{device=~\"^/dev/[sv]d[a-z][1-9]$\",container_name!=\"POD\", namespace=~\"^$namespace$\", pod_name=~\"^$pod$\"}\n) by (pod_name, namespace)",
+                "format": "time_series",
+                "hide": false,
+                "interval": "10s",
+                "intervalFactor": 1,
+                "refId": "A",
+                "step": 30
+              }
+            ],
+            "thresholds": "",
+            "title": "Current Disk Usage",
+            "type": "singlestat",
+            "valueFontSize": "50%",
+            "valueMaps": [
+              {
+                "op": "=",
+                "text": "N/A",
+                "value": "null"
+              }
+            ],
+            "valueName": "current"
+          },
+          {
+            "cacheTimeout": null,
+            "colorBackground": false,
+            "colorValue": false,
+            "colors": [
+              "rgba(50, 172, 45, 0.97)",
+              "rgba(237, 129, 40, 0.89)",
+              "rgba(245, 54, 54, 0.9)"
+            ],
+            "datasource": "Prometheus",
+            "decimals": 2,
+            "editable": true,
+            "error": false,
+            "format": "bytes",
+            "gauge": {
+              "maxValue": 100,
+              "minValue": 0,
+              "show": false,
+              "thresholdLabels": false,
+              "thresholdMarkers": true
+            },
+            "gridPos": {
+              "h": 5,
+              "w": 12,
+              "x": 12,
+              "y": 25
+            },
+            "height": "1px",
+            "id": 9,
+            "interval": null,
+            "links": [],
+            "mappingType": 1,
+            "mappingTypes": [
+              {
+                "name": "value to text",
+                "value": 1
+              },
+              {
+                "name": "range to text",
+                "value": 2
+              }
+            ],
+            "maxDataPoints": 100,
+            "nullPointMode": "connected",
+            "nullText": null,
+            "postfix": "",
+            "postfixFontSize": "50%",
+            "prefix": "",
+            "prefixFontSize": "50%",
+            "rangeMaps": [
+              {
+                "from": "null",
+                "text": "N/A",
+                "to": "null"
+              }
+            ],
+            "sparkline": {
+              "fillColor": "rgba(31, 118, 189, 0.18)",
+              "full": false,
+              "lineColor": "rgb(31, 120, 193)",
+              "show": false
+            },
+            "tableColumn": "",
+            "targets": [
+              {
+                "expr": "sum (\n  sum (kube_persistentvolumeclaim_resource_requests_storage_bytes{namespace=~\"^$namespace$\", persistentvolumeclaim=~\"^$volume$\"})\n) by (persistentvolumeclaim, namespace)",
+                "format": "time_series",
+                "hide": false,
+                "interval": "10s",
+                "intervalFactor": 1,
+                "refId": "A",
+                "step": 30
+              }
+            ],
+            "thresholds": "",
+            "title": "Total Available Disk Size",
+            "type": "singlestat",
+            "valueFontSize": "50%",
+            "valueMaps": [
+              {
+                "op": "=",
+                "text": "N/A",
+                "value": "null"
+              }
+            ],
+            "valueName": "current"
+          }
+        ],
+        "refresh": "10s",
+        "schemaVersion": 18,
+        "style": "dark",
+        "tags": [],
+        "templating": {
+          "list": [
+            {
+              "current": {
+                "text": "Prometheus",
+                "value": "Prometheus"
+              },
+              "hide": 0,
+              "includeAll": false,
+              "label": null,
+              "multi": false,
+              "name": "datasource",
+              "options": [],
+              "query": "prometheus",
+              "refresh": 1,
+              "regex": "",
+              "skipUrlSync": false,
+              "type": "datasource"
+            },
+            {
+              "allValue": null,
+              "current": {
+                "text": "kubernetes-demo",
+                "value": "kubernetes-demo"
+              },
+              "datasource": "$datasource",
+              "definition": "",
+              "hide": 0,
+              "includeAll": false,
+              "label": "namespace",
+              "multi": false,
+              "name": "namespace",
+              "options": [],
+              "query": "label_values(kube_pod_info, namespace)",
+              "refresh": 1,
+              "regex": "",
+              "skipUrlSync": false,
+              "sort": 2,
+              "tagValuesQuery": "",
+              "tags": [],
+              "tagsQuery": "",
+              "type": "query",
+              "useTags": false
+            },
+            {
+              "allValue": null,
+              "current": {
+                "text": "All",
+                "value": [
+                  "$__all"
+                ]
+              },
+              "datasource": "$datasource",
+              "definition": "",
+              "hide": 0,
+              "includeAll": true,
+              "label": "pods",
+              "multi": true,
+              "name": "pod",
+              "options": [],
+              "query": "label_values(kube_pod_info{namespace=~\"$namespace\"}, pod)",
+              "refresh": 2,
+              "regex": "",
+              "skipUrlSync": false,
+              "sort": 0,
+              "tagValuesQuery": "",
+              "tags": [],
+              "tagsQuery": "",
+              "type": "query",
+              "useTags": false
+            }
+          ]
+        },
+        "time": {
+          "from": "now-1h",
+          "to": "now"
+        },
+        "timepicker": {
+          "refresh_intervals": [
+            "5s",
+            "10s",
+            "30s",
+            "1m",
+            "5m",
+            "15m",
+            "30m",
+            "1h",
+            "2h",
+            "1d"
+          ],
+          "time_options": [
+            "5m",
+            "15m",
+            "1h",
+            "6h",
+            "12h",
+            "24h",
+            "2d",
+            "7d",
+            "30d"
+          ]
+        },
+        "timezone": "",
+        "title": "Kubernetes Namespace Monitoring",
+        "uid": "98wzmmtojsqf3gjh11rr7hynxqrgqjv4",
+        "version": 1
+        }
+    
+---
+# Source: grafana/templates/service-account.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: grafana
+  namespace: monitoring
+
+---
+# Source: grafana/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:    
+    app: grafana
+  name: grafana
+  namespace: monitoring
+spec:
+  type: LoadBalancer
+  ports:
+  - name: http
+    port: 3000
+  selector:    
+    app: grafana
+
+---
+# Source: grafana/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: monitoring
+  labels:    
+    app: grafana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:      
+      app: grafana
+  template:
+    metadata:
+      labels:        
+        app: grafana
+    spec:
+      containers:
+      - name: grafana
+        image: grafana/grafana:6.1.6
+        imagePullPolicy: Always
+        ports:
+        - name: http
+          containerPort: 3000
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: http
+        resources:
+          limits:
+            cpu: 200m
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        volumeMounts:
+        - name: grafana-ini
+          mountPath: /etc/grafana/grafana.ini
+          subPath: grafana.ini
+        - mountPath: /etc/grafana/provisioning/datasources
+          name: grafana-datasource
+        - mountPath: /etc/grafana/provisioning/dashboards
+          name: grafana-dashboards
+        - mountPath: /grafana-dashboard-definitions/0/cluster-compute-resources
+          name: grafana-cluster-compute-resources
+        - mountPath: /grafana-dashboard-definitions/0/namespace-compute-resources
+          name: grafana-namespace-compute-resources
+        - mountPath: /grafana-dashboard-definitions/0/namespace-quotas
+          name: grafana-namespace-quotas
+      serviceAccountName: grafana
+      volumes:
+      - name: grafana-ini
+        configMap:  
+          name: grafana-ini
+      - name: grafana-datasource
+        configMap:
+          name: grafana-datasource
+      - name: grafana-dashboards
+        configMap:  
+          name: grafana-dashboards
+      - name: grafana-cluster-compute-resources
+        configMap:
+          name: grafana-cluster
+      - name: grafana-namespace-compute-resources
+        configMap:
+          name: grafana-namespace
+      - name: grafana-namespace-quotas
+        configMap:
+          name: grafana-namespace-quotas

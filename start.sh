@@ -41,7 +41,7 @@ function start_with_compose {
 
 function start_with_kubernetes {
     echo "Deploying Sample App using Kubernetes..."
-    kubectl apply -f kubernetes-manifests
+    kubectl apply -f sample-app-kubernetes-manifests
 }
 
 echo "Starting Sample App..."

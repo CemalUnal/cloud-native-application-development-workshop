@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb
+  namespace: kubernetes-demo
+spec:
+  replicas: 1
+  serviceName: mongodb
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+      - image: mongo:4.0.2
+        name: mongodb
+        ports:
+          - containerPort: 27017
+        volumeMounts:
+          - name: data
+            mountPath: /data/db
+        imagePullPolicy: IfNotPresent
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: "default"
+      resources:
+        requests:
+          storage: 500Mi
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb
+  namespace: kubernetes-demo
+  labels:
+    app: mongodb
+spec:
+  ports:
+  - port: 27017
+  selector:
+    app: mongodb

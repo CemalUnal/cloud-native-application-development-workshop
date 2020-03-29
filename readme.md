@@ -17,7 +17,7 @@
 
 - [example-docker-commands](./example-docker-commands) contains sample Docker commands that will get you familiar with Docker concepts and its CLI usage.
 
-- [docker-compose-manifests](./docker-compose-manifests) and [kubernetes-manifests](./kubernetes-manifests) directories contain Docker Compose and Kubernetes manifests for the sample application that is available in [this repository](https://github.com/cemalunal/sample-crud-app).
+- [docker-compose-manifests](./docker-compose-manifests) and [sample-app-kubernetes-manifests](./sample-app-kubernetes-manifests) directories contain Docker Compose and Kubernetes manifests for the sample application that is available in [this repository](https://github.com/cemalunal/sample-crud-app).
 
 - [12-factor-implementation-using-docker.md](./12-factor-implementation-using-docker.md) describes how the sample application can be run locally using `docker run` commands in detail by following [12 Factor App methodology](https://12factor.net/).
 
@@ -88,27 +88,15 @@ Docker for Windows already includes Docker Compose.
 Choose one of two options available below:
 
 ### 1- Using a Kubernetes Playground
-[Katacoda Kubernetes Playground](https://www.katacoda.com/courses/kubernetes/playground) will be used to explore Kubernetes features. It provides two node Kubernetes cluster, one of them is master and the other one is worker. In order to use the playground you may need to create a Katacoda account.
+[Katacoda Kubernetes Playground](https://www.katacoda.com/courses/kubernetes/playground) can be used to explore Kubernetes features. It provides two node Kubernetes cluster, one of them is master and the other one is worker. In order to use the playground you may need to create a Katacoda account.
 
 ### 2- Installing Kubernetes Locally
 
 #### Using Minikube
 
-#### Linux
-TBD
+Please consult to [this documentation](https://kubernetes.io/docs/tasks/tools/install-minikube/) in order to install Minikube to different operating systems.
 
-#### Mac
-
-```bash
-brew install minikube
-```
-
-```bash
-minikube start --vm-driver=hyperkit
-```
-
-#### Windows
-TBD
+Also you will need to install `kubectl` in order to communicate with your Minikube. For its installation instructions follow [this guide](https://kubernetes.io/docs/tasks/tools/install-kubectl/).
 
 ### PART-1
 

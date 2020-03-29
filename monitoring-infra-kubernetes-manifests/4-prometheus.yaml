@@ -1,0 +1,238 @@
+---
+# Source: prometheus/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus
+  labels:    
+    app: prometheus
+  namespace: monitoring
+data:
+  prometheus.yml: |-
+    global:
+      scrape_interval: 5s
+      evaluation_interval: 5s
+    
+    rule_files:
+      - "/etc/prometheus-rules/*.rules"
+
+    # alerting:
+    #   alertmanagers:
+    #     - scheme: http
+    #       path_prefix: /
+    #       static_configs:
+    #         - targets: ['alertmanager:9093']
+
+    scrape_configs:
+    - job_name: kubernetes-nodes-cadvisor
+      scrape_interval: 10s
+      scrape_timeout: 10s
+      scheme: https
+      tls_config:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      kubernetes_sd_configs:
+        - role: node
+      relabel_configs:
+        - action: labelmap
+          regex: __meta_kubernetes_node_label_(.+)
+        # Only for Kubernetes ^1.7.3.
+        # See: https://github.com/prometheus/prometheus/issues/2916
+        - target_label: __address__
+          replacement: kubernetes.default.svc:443
+        - source_labels: [__meta_kubernetes_node_name]
+          regex: (.+)
+          target_label: __metrics_path__
+          replacement: /api/v1/nodes/${1}/proxy/metrics/cadvisor
+      metric_relabel_configs:
+        - action: replace
+          source_labels: [id]
+          regex: '^/machine\.slice/machine-rkt\\x2d([^\\]+)\\.+/([^/]+)\.service$'
+          target_label: rkt_container_name
+          replacement: '${2}-${1}'
+        - action: replace
+          source_labels: [id]
+          regex: '^/system\.slice/(.+)\.service$'
+          target_label: systemd_service_name
+          replacement: '${1}'
+
+    - job_name: 'kubernetes-pods'
+      kubernetes_sd_configs:
+        - role: pod
+      relabel_configs:
+        - action: labelmap
+          regex: __meta_kubernetes_pod_label_(.+)
+        - source_labels: [__meta_kubernetes_namespace]
+          action: replace
+          target_label: kubernetes_namespace
+        - source_labels: [__meta_kubernetes_pod_name]
+          action: replace
+          target_label: kubernetes_pod_name
+        - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+          action: keep
+          regex: true
+        - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scheme]
+          action: replace
+          target_label: __scheme__
+          regex: (https?)
+        - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+          action: replace
+          target_label: __metrics_path__
+          regex: (.+)
+        - source_labels: [__address__, __meta_kubernetes_pod_prometheus_io_port]
+          action: replace
+          target_label: __address__
+          regex: (.+)(?::\d+);(\d+)
+          replacement: $1:$2
+
+
+    - job_name: 'kubernetes-apiservers'
+      kubernetes_sd_configs:
+        - role: endpoints
+      scheme: https 
+      tls_config:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      relabel_configs:
+        - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+          action: keep
+          regex: default;kubernetes;https
+
+    - job_name: 'kubernetes-service-endpoints'
+      kubernetes_sd_configs:
+        - role: endpoints
+      relabel_configs:
+        - action: labelmap
+          regex: __meta_kubernetes_service_label_(.+)
+        - source_labels: [__meta_kubernetes_namespace]
+          action: replace
+          target_label: kubernetes_namespace
+        - source_labels: [__meta_kubernetes_service_name]
+          action: replace
+          target_label: kubernetes_name
+        - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]
+          action: keep
+          regex: true
+        - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]
+          action: replace
+          target_label: __scheme__
+          regex: (https?)
+        - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_path]
+          action: replace
+          target_label: __metrics_path__
+          regex: (.+)
+        - source_labels: [__address__, __meta_kubernetes_service_annotation_prometheus_io_port]
+          action: replace
+          target_label: __address__
+          regex: (.+)(?::\d+);(\d+)
+          replacement: $1:$2
+
+---
+# Source: prometheus/templates/service-account.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: prometheus
+  namespace: monitoring
+  labels:    
+    app: prometheus
+
+---
+# Source: prometheus/templates/cluster-role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: prometheus
+  labels:    
+    app: prometheus
+rules:
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+
+---
+# Source: prometheus/templates/cluster-role-binding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: prometheus
+subjects:
+- kind: ServiceAccount
+  name: prometheus
+  namespace: monitoring
+roleRef:
+  kind: ClusterRole
+  name: prometheus
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# Source: prometheus/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata: 
+  name: prometheus
+  namespace: monitoring
+  labels:    
+    app: prometheus
+  annotations: 
+    prometheus.io/scrape: "true"
+spec:
+  ports: 
+    - name: prometheus
+      port: 9090
+      targetPort: 9090
+  selector:    
+    app: prometheus
+
+---
+# Source: prometheus/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: monitoring
+  labels:    
+    app: prometheus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:      
+      app: prometheus
+  template:
+    metadata:
+      labels:        
+        app: prometheus
+    spec:
+      serviceAccountName: prometheus
+      containers:
+        - name: prometheus
+          image: prom/prometheus:v2.9.2
+          imagePullPolicy: Always
+          args:
+            - "--config.file=/etc/prometheus/prometheus.yml"
+            - "--storage.tsdb.path=/prometheus/"
+            - "--web.enable-lifecycle"
+            - "--storage.tsdb.no-lockfile"
+          ports:
+            - name: prometheus
+              containerPort: 9090
+          volumeMounts:
+            - name: prometheus-config
+              mountPath: /etc/prometheus
+          resources:
+            limits:
+              cpu: 575m
+              memory: 1024Mi
+            requests:
+              cpu: 575m
+              memory: 512Mi
+      volumes:
+        - name: prometheus-config
+          configMap:
+            defaultMode: 420
+            name: prometheus

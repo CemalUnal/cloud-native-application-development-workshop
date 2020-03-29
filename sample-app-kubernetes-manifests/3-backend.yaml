@@ -2,9 +2,9 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: demo-backend-cm
-  namespace: k8s-demo
+  namespace: kubernetes-demo
 data:
-  MONGODB_URI: "mongodb://mongo-deployment.k8s-demo.svc.cluster.local:27017/sample-app"
+  MONGODB_URI: "mongodb://mongodb-0.mongodb.kubernetes-demo.svc.cluster.local:27017/sample-app"
   JAVA_OPTS: "-Dspring.profiles.active=local-docker -Xms125m -Xmx250m"
 
 ---
@@ -13,7 +13,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: demo-backend-deployment-service
-  namespace: k8s-demo
+  namespace: kubernetes-demo
   labels:
     app: demo-backend-deployment
 spec:
@@ -31,9 +31,9 @@ metadata:
   name: demo-backend-deployment
   labels:        
     app: demo-backend-deployment
-  namespace: k8s-demo
+  namespace: kubernetes-demo
 spec: 
-  replicas: 1
+  replicas: 3
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -48,15 +48,20 @@ spec:
         app: demo-backend-deployment
     spec:
       containers:
-        - image: cunal/demo-backend:6685333069ec622c9c314b95f6df6cf8cc02afe0
+        - image: cunal/demo-backend:51e393ef4be964e1c0a11cbc869d397a82700190
           imagePullPolicy: IfNotPresent
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 80
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            timeoutSeconds: 3
           resources:
             requests:
-              memory: "250Mi"
-              cpu: "400m"
+              cpu: "800m"
             limits:
-              memory: "300Mi"
-              cpu: "500m"
+              cpu: "1000m"
           name: demo-backend-deployment
           ports: 
             - containerPort: 80
@@ -70,16 +75,16 @@ apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
   name: demo-backend-hpa
-  namespace: k8s-demo
+  namespace: kubernetes-demo
 spec:
   scaleTargetRef:
     apiVersion: extensions/v1beta1
     kind: Deployment
     name: demo-backend-deployment
-  minReplicas: 1
-  maxReplicas: 3
+  minReplicas: 3
+  maxReplicas: 7
   metrics:
   - type: Resource
     resource:
       name: cpu
-      targetAverageUtilization: 70
+      targetAverageUtilization: 10

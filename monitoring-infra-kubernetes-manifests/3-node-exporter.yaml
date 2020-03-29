@@ -1,0 +1,72 @@
+---
+# Source: node-exporter/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: node-exporter
+  namespace: monitoring
+  labels:    
+    app: node-exporter
+  annotations:
+    prometheus.io/scrape: "true"
+spec:
+  ports:
+    - name: metrics
+      port: 9100
+      targetPort: 9100
+  selector:    
+    app: node-exporter
+
+---
+# Source: node-exporter/templates/daemonset.yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: node-exporter
+  namespace: monitoring
+  labels:    
+    app: node-exporter
+spec:
+  selector:
+    matchLabels:      
+      app: node-exporter
+  template:
+    metadata:
+      labels:        
+        app: node-exporter
+    spec:
+      containers:
+        - name: prometheus-node-exporter
+          image: prom/node-exporter:v0.17.0
+          imagePullPolicy: Always
+          args:
+            - --path.procfs=/host/proc
+            - --path.sysfs=/host/sys
+          ports:
+            - name: metrics
+              containerPort: 9100
+              hostPort: 9100
+          volumeMounts:
+            - name: proc
+              mountPath: /host/proc
+              readOnly:  true
+            - name: sys
+              mountPath: /host/sys
+              readOnly: true
+          resources:
+            limits:
+              cpu: 10m
+              memory: 250Mi
+            requests:
+              cpu: 10m
+              memory: 150Mi
+      hostNetwork: true
+      hostPID: true
+      volumes:
+        - name: proc
+          hostPath:
+            path: /proc
+        - name: sys
+          hostPath:
+            path: /sys
+

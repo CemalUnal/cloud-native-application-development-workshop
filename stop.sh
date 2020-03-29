@@ -28,7 +28,7 @@ function stop_with_compose {
 }
 
 function stop_with_kubernetes {
-    kubectl delete -f kubernetes-manifests
+    kubectl delete -f sample-app-kubernetes-manifests
 }
 
 echo "Removing Sample App..."
